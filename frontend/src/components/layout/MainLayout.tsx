@@ -8,17 +8,21 @@ import { AnimatePresence, motion } from "framer-motion"
 import { PageTransition } from "./PageTransition"
 import { GovernmentFooter } from "./GovernmentFooter"
 import { GlobalSearchDialog } from "./GlobalSearchDialog"
-import { EmergencyAlerts } from "@/features/dashboard/components/EmergencyAlerts"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 
 export function MainLayout() {
   const location = useLocation()
-  const isAIPage = location.pathname.startsWith('/ai')
-  const isNetworkPage = location.pathname.startsWith('/network')
+  const isAIPage = location.pathname.startsWith('/app/ai') || location.pathname.startsWith('/ai')
+  const isNetworkPage = location.pathname.startsWith('/app/network') || location.pathname.startsWith('/network')
   const isEdgeToEdge = isAIPage || isNetworkPage
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  // Auto-close mobile sidebar drawer on route change
+  useEffect(() => {
+    setIsSidebarOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -51,12 +55,8 @@ export function MainLayout() {
     <div className="flex h-screen flex-col bg-background font-sans overflow-hidden">
       <GlobalSearchDialog open={isSearchOpen} onOpenChange={setIsSearchOpen} />
       
-      <div className="shrink-0">
+      <div className="shrink-0 z-40">
         <GovernmentHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-      </div>
-
-      <div className="shrink-0">
-        <EmergencyAlerts />
       </div>
       
       <div className="flex flex-1 overflow-hidden relative">
@@ -75,14 +75,14 @@ export function MainLayout() {
 
         {/* Sidebar */}
         <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-card ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shrink-0 mt-[56px] md:mt-0 h-[calc(100vh-56px)] md:h-full`}>
-          <Sidebar />
+          <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </aside>
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-hidden bg-muted/30">
           <ErrorBoundary>
             <Suspense fallback={
-              <div className="h-full w-full p-8 flex flex-col gap-6 overflow-y-auto">
+              <div className="h-full w-full p-4 md:p-8 flex flex-col gap-6 overflow-y-auto">
                 <div className="flex items-center gap-4">
                   <Skeleton className="h-12 w-12 rounded-full" />
                   <div className="space-y-2">
@@ -98,7 +98,7 @@ export function MainLayout() {
                 <Skeleton className="flex-1 w-full rounded-xl" />
               </div>
             }>
-              <div className={`h-full w-full overflow-y-auto ${!isEdgeToEdge ? 'container mx-auto p-4 md:p-6 lg:p-8' : ''} flex flex-col`}>
+              <div className={`h-full w-full overflow-y-auto ${!isEdgeToEdge ? 'container mx-auto p-3 sm:p-4 md:p-6 lg:p-8' : ''} flex flex-col`}>
                 <AnimatePresence mode="wait">
                   <PageTransition>
                     <div className="flex-1 flex flex-col">

@@ -10,6 +10,7 @@ import { lazy } from "react"
 
 // Lazy loaded Auth Features
 const Login = lazy(() => import("@/features/auth/Login").then(m => ({ default: m.Login })))
+const Register = lazy(() => import("@/features/auth/Register").then(m => ({ default: m.Register })))
 const ForgotPassword = lazy(() => import("@/features/auth/ForgotPassword").then(m => ({ default: m.ForgotPassword })))
 const OtpVerification = lazy(() => import("@/features/auth/OtpVerification").then(m => ({ default: m.OtpVerification })))
 const RoleSelection = lazy(() => import("@/features/auth/RoleSelection").then(m => ({ default: m.RoleSelection })))
@@ -70,6 +71,7 @@ function App() {
           }>
             <Route index element={<Navigate to="/auth/login" replace />} />
             <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="otp" element={<OtpVerification />} />
             <Route path="role-selection" element={<RoleSelection />} />

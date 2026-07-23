@@ -36,23 +36,27 @@ export function Login() {
   })
 
   const onSubmit = async (data: LoginForm) => {
-    if (data.captcha !== captchaText) {
-      setError("captcha", { message: t("auth.captchaError") })
+    if (data.captcha.trim() !== captchaText.trim()) {
+      setError("captcha", { message: t("auth.captchaIncorrect", { defaultValue: "Incorrect CAPTCHA. Please try again." }) })
+      toast.error(t("auth.invalidCaptcha", { defaultValue: "Incorrect CAPTCHA. Please try again." }))
       return
     }
 
     setIsLoading(true)
     try {
-      const success = await login(data.badgeId, data.password)
+      const result = await login(data.badgeId, data.password)
       
-      if (success) {
-        toast.success(t("auth.loginSuccess"))
-        navigate("/auth/otp")
+      if (result.success) {
+        toast.success(t("auth.loginSuccess", { defaultValue: "Login successful. Welcome back!" }))
+        navigate("/auth/role-selection")
       } else {
-        toast.error(t("auth.loginError"))
+        const errorMsg = result.errorKey
+          ? t(result.errorKey)
+          : t("auth.loginError", { defaultValue: "Invalid Badge ID / Email or password. Please try again." })
+        toast.error(errorMsg)
       }
     } catch {
-      toast.error(t("auth.authError"))
+      toast.error(t("auth.authError", { defaultValue: "An error occurred during authentication." }))
     } finally {
       setIsLoading(false)
     }
@@ -60,21 +64,21 @@ export function Login() {
 
   return (
     <Card className="w-full shadow-sm border-t-2 border-t-primary">
-      <CardHeader className="space-y-3 text-center pb-6 pt-8">
-        <div className="mx-auto flex flex-col items-center justify-center mb-1 space-y-2">
+      <CardHeader className="space-y-2.5 text-center px-4 sm:px-8 pb-4 sm:pb-6 pt-5 sm:pt-8">
+        <div className="mx-auto flex flex-col items-center justify-center mb-1 space-y-1.5">
           <img 
             src={karnatakaEmblem} 
             alt="Karnataka State Police Emblem" 
-            className="h-16 w-auto object-contain" 
+            className="h-12 sm:h-16 w-auto object-contain" 
           />
           <span className="text-[10px] font-extrabold tracking-widest text-primary uppercase">{t("header.ksp")}</span>
         </div>
-        <CardTitle className="text-2xl font-bold">{t("auth.login")}</CardTitle>
-        <CardDescription className="text-sm">
+        <CardTitle className="text-xl sm:text-2xl font-bold">{t("auth.login")}</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
           {t("auth.authDesc")}
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-8 pb-6">
+      <CardContent className="px-4 sm:px-8 pb-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground" htmlFor="badgeId">
@@ -149,11 +153,13 @@ export function Login() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col text-center border-t p-6 bg-muted/50 rounded-b-lg">
-        <p className="text-xs text-muted-foreground">
-          {t("auth.troubleLogging")} <br/>
-          <a href="mailto:support@scrb.ksp.gov.in" className="text-primary hover:underline">support@scrb.ksp.gov.in</a>
-        </p>
+      <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t p-4 sm:px-6 bg-muted/30 rounded-b-lg text-xs">
+        <span className="text-muted-foreground font-medium">Don't have an account?</span>
+        <Link to="/auth/register" className="w-full sm:w-auto">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto font-semibold text-primary border-primary/30 hover:bg-primary/5">
+            Create Account
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   )

@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { 
   Palette, Globe, Accessibility, Bell, Shield, Key, 
-  User, Keyboard, Info, Check, LogOut 
+  User as UserIcon, Keyboard, Info, Check, LogOut, Camera, Save
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,9 +9,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useAuthStore } from "@/store/useAuthStore"
 import { useTranslation } from "react-i18next"
 import { useLanguage } from "@/hooks/useLanguage"
+import { toast } from "sonner"
 
 const SETTINGS_TABS = [
-  { id: "profile", label: "settings.profile", icon: User },
+  { id: "profile", label: "settings.profile", icon: UserIcon },
   { id: "appearance", label: "settings.appearance", icon: Palette },
   { id: "language", label: "settings.language", icon: Globe },
   { id: "accessibility", label: "settings.accessibility", icon: Accessibility },
@@ -24,45 +25,172 @@ const SETTINGS_TABS = [
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile")
-  const { logout } = useAuthStore()
+  const { user, activeRole, updateUserProfile, logout } = useAuthStore()
   const { t } = useTranslation()
+
+  // Profile Form State initialized from authenticated user
+  const [name, setName] = useState(user?.name || "")
+  const [email, setEmail] = useState(user?.email || "")
+  const [phone, setPhone] = useState(user?.phone || "+91 98765 43210")
+  const [department, setDepartment] = useState(user?.department || "State Crime Records Bureau")
+  const [avatar, setAvatar] = useState(user?.avatar || "")
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Keep form fields synced if user object changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "")
+      setEmail(user.email || "")
+      setPhone(user.phone || "+91 98765 43210")
+      setDepartment(user.department || "State Crime Records Bureau")
+      setAvatar(user.avatar || "")
+    }
+  }, [user])
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSaving(true)
+    
+    updateUserProfile({
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      department: department.trim(),
+      avatar: avatar,
+    })
+
+    setTimeout(() => {
+      setIsSaving(false)
+      toast.success(t("settings.profileUpdated", { defaultValue: "Profile updated successfully!" }))
+    }, 300)
+  }
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setAvatar(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const getInitials = (fullName: string) => {
+    if (!fullName) return "KSP"
+    const parts = fullName.trim().split(" ")
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return fullName.slice(0, 2).toUpperCase()
+  }
 
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
         return (
-          <div className="space-y-6">
+          <div className="space-y-6 font-sans">
             <div>
-              <h2 className="text-xl font-semibold">{t("settings.profile")}</h2>
+              <h2 className="text-xl font-bold tracking-tight text-foreground">{t("settings.profile")}</h2>
               <p className="text-sm text-muted-foreground">{t("settings.profileDesc")}</p>
             </div>
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div className="flex items-center gap-6">
-                  <div className="h-20 w-20 bg-primary/20 text-primary flex items-center justify-center rounded-full text-2xl font-bold">
-                    ID
+            <Card className="rounded-xl border-border/80 shadow-2xs">
+              <CardContent className="p-6 space-y-6">
+                <form onSubmit={handleSaveProfile} className="space-y-6">
+                  {/* Avatar Upload Area */}
+                  <div className="flex items-center gap-6 pb-4 border-b border-border/60">
+                    <div className="relative group shrink-0">
+                      {avatar ? (
+                        <img 
+                          src={avatar} 
+                          alt="User Avatar" 
+                          className="h-20 w-20 rounded-full object-cover border-2 border-primary shadow-xs" 
+                        />
+                      ) : (
+                        <div className="h-20 w-20 bg-primary/10 border-2 border-primary/30 text-primary flex items-center justify-center rounded-full text-2xl font-extrabold font-mono shadow-xs">
+                          {getInitials(name)}
+                        </div>
+                      )}
+                      <label 
+                        htmlFor="avatar-upload"
+                        className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-primary-foreground shadow-sm cursor-pointer hover:bg-primary/90 transition-colors"
+                        title="Upload Profile Picture"
+                      >
+                        <Camera className="h-3.5 w-3.5" />
+                        <input 
+                          id="avatar-upload" 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleAvatarChange}
+                        />
+                      </label>
+                    </div>
+                    <div className="space-y-1">
+                      <h3 className="font-bold text-base text-foreground">{name || user?.name}</h3>
+                      <p className="text-xs text-muted-foreground">Badge ID: <span className="font-mono font-bold text-primary">{user?.badgeId}</span></p>
+                      <p className="text-xs text-muted-foreground">Active Role: <span className="font-semibold text-foreground">{activeRole || "Investigator"}</span></p>
+                    </div>
                   </div>
-                  <Button variant="outline">{t("settings.changeAvatar")}</Button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("settings.fullName")}</label>
-                    <Input defaultValue="Inspector Rajesh Kumar" />
+
+                  {/* Form Inputs Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.fullName")}</label>
+                      <Input 
+                        value={name} 
+                        onChange={(e) => setName(e.target.value)} 
+                        placeholder="Enter full name"
+                        className="h-9 text-xs"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.badgeNumber")}</label>
+                      <Input 
+                        value={user?.badgeId || ""} 
+                        disabled 
+                        className="h-9 text-xs font-mono bg-muted/50 cursor-not-allowed"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.email")}</label>
+                      <Input 
+                        type="email"
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        placeholder="Enter email address"
+                        className="h-9 text-xs"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.phoneNumber")}</label>
+                      <Input 
+                        value={phone} 
+                        onChange={(e) => setPhone(e.target.value)} 
+                        placeholder="Enter phone number"
+                        className="h-9 text-xs"
+                      />
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
+                      <label className="text-xs font-semibold text-foreground leading-none">Department / Bureau</label>
+                      <Input 
+                        value={department} 
+                        onChange={(e) => setDepartment(e.target.value)} 
+                        placeholder="Enter department name"
+                        className="h-9 text-xs"
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("settings.badgeNumber")}</label>
-                    <Input defaultValue="KSP-88392" disabled />
+
+                  <div className="pt-2">
+                    <Button type="submit" disabled={isSaving} className="px-5 font-semibold text-xs h-9">
+                      <Save className="h-4 w-4 mr-2" />
+                      {isSaving ? "Saving..." : t("settings.saveChanges")}
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("settings.email")}</label>
-                    <Input defaultValue="rajesh.k@ksp.gov.in" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("settings.phoneNumber")}</label>
-                    <Input defaultValue="+91 98765 43210" />
-                  </div>
-                </div>
-                <Button className="mt-4">{t("settings.saveChanges")}</Button>
+                </form>
               </CardContent>
             </Card>
           </div>
@@ -73,34 +201,27 @@ export function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{t("settings.appearance")}</h2>
+              <h2 className="text-xl font-bold text-foreground">{t("settings.appearance")}</h2>
               <p className="text-sm text-muted-foreground">{t("settings.appearanceDesc")}</p>
             </div>
-            <Card>
+            <Card className="rounded-xl border-border/80 shadow-2xs">
               <CardContent className="p-6 space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium mb-3">{t("settings.theme")}</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">{t("settings.theme")}</h3>
                   <div className="flex gap-4">
-                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-primary rounded-sm p-2">
-                      <div className="w-24 h-16 bg-white rounded shadow-sm border flex flex-col gap-1 p-1">
-                        <div className="w-full h-2 bg-gray-200 rounded"></div>
-                        <div className="w-1/2 h-2 bg-gray-200 rounded"></div>
+                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-primary rounded-xl p-2.5 bg-card shadow-2xs">
+                      <div className="w-24 h-16 bg-white rounded-lg border border-slate-200 flex flex-col gap-1 p-1.5">
+                        <div className="w-full h-2 bg-slate-200 rounded"></div>
+                        <div className="w-1/2 h-2 bg-slate-200 rounded"></div>
                       </div>
-                      <span className="text-xs font-semibold">{t("settings.lightMode")}</span>
+                      <span className="text-xs font-bold text-foreground">{t("settings.lightMode")}</span>
                     </div>
-                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-transparent rounded-sm p-2 opacity-50 hover:opacity-100">
-                      <div className="w-24 h-16 bg-gray-900 rounded shadow-sm border border-gray-800 flex flex-col gap-1 p-1">
-                        <div className="w-full h-2 bg-gray-800 rounded"></div>
-                        <div className="w-1/2 h-2 bg-gray-800 rounded"></div>
+                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-transparent rounded-xl p-2.5 opacity-50 hover:opacity-100 transition-opacity">
+                      <div className="w-24 h-16 bg-slate-900 rounded-lg border border-slate-800 flex flex-col gap-1 p-1.5">
+                        <div className="w-full h-2 bg-slate-800 rounded"></div>
+                        <div className="w-1/2 h-2 bg-slate-800 rounded"></div>
                       </div>
-                      <span className="text-xs font-semibold">{t("settings.darkMode")}</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-transparent rounded-sm p-2 opacity-50 hover:opacity-100">
-                      <div className="w-24 h-16 bg-gradient-to-r from-gray-100 to-gray-800 rounded shadow-sm border flex flex-col gap-1 p-1">
-                        <div className="w-full h-2 bg-gray-400 rounded"></div>
-                        <div className="w-1/2 h-2 bg-gray-400 rounded"></div>
-                      </div>
-                      <span className="text-xs font-semibold">{t("settings.systemMode")}</span>
+                      <span className="text-xs font-bold text-foreground">{t("settings.darkMode")}</span>
                     </div>
                   </div>
                 </div>
@@ -112,22 +233,22 @@ export function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{t("settings.security")}</h2>
+              <h2 className="text-xl font-bold text-foreground">{t("settings.security")}</h2>
               <p className="text-sm text-muted-foreground">{t("settings.securityDesc")}</p>
             </div>
-            <Card>
+            <Card className="rounded-xl border-border/80 shadow-2xs">
               <CardContent className="p-6 space-y-4">
-                <div className="space-y-2 border-b pb-4">
-                  <h3 className="font-semibold">{t("settings.twoFactorAuth")}</h3>
-                  <p className="text-sm text-muted-foreground">{t("settings.twoFactorDesc")}</p>
-                  <Button variant="outline" className="mt-2 text-green-600 border-green-200 hover:bg-green-50">
-                    <Check className="w-4 h-4 mr-2" /> {t("settings.enabled")}
+                <div className="space-y-2 border-b border-border/60 pb-4">
+                  <h3 className="font-bold text-sm text-foreground">{t("settings.twoFactorAuth")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("settings.twoFactorDesc")}</p>
+                  <Button variant="outline" size="sm" className="mt-2 text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-xs">
+                    <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> {t("settings.enabled")}
                   </Button>
                 </div>
                 <div className="space-y-2 pt-2">
-                  <h3 className="font-semibold">{t("settings.passwordReset")}</h3>
-                  <p className="text-sm text-muted-foreground">{t("settings.passwordResetDesc")}</p>
-                  <Button variant="secondary" className="mt-2">{t("settings.updatePassword")}</Button>
+                  <h3 className="font-bold text-sm text-foreground">{t("settings.passwordReset")}</h3>
+                  <p className="text-xs text-muted-foreground">{t("settings.passwordResetDesc")}</p>
+                  <Button variant="secondary" size="sm" className="mt-2 text-xs font-semibold">{t("settings.updatePassword")}</Button>
                 </div>
               </CardContent>
             </Card>
@@ -137,37 +258,20 @@ export function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold">{t("settings.about")}</h2>
+              <h2 className="text-xl font-bold text-foreground">{t("settings.about")}</h2>
               <p className="text-sm text-muted-foreground">{t("settings.aboutDesc")}</p>
             </div>
-            <Card>
-              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 py-12">
-                <div className="w-16 h-16 bg-primary rounded-sm flex items-center justify-center mb-2">
-                  <Shield className="w-8 h-8 text-primary-foreground" />
+            <Card className="rounded-xl border-border/80 shadow-2xs">
+              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 py-10">
+                <div className="w-14 h-14 bg-primary text-primary-foreground rounded-xl flex items-center justify-center mb-1 shadow-2xs">
+                  <Shield className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold">{t("settings.aboutTitle")}</h3>
-                <p className="text-muted-foreground">{t("settings.version")}</p>
-                <div className="flex gap-4 mt-6 mb-4">
-                  <Button variant="link">{t("settings.termsOfService")}</Button>
-                  <Button variant="link">{t("settings.privacyPolicy")}</Button>
-                  <Button variant="link">{t("settings.releaseNotes")}</Button>
-                </div>
-                
-                <div className="mt-8 border-t pt-8 w-full max-w-sm flex items-center justify-between">
-                  <div className="text-left">
-                    <h4 className="font-semibold text-sm">{t("settings.presentationMode")}</h4>
-                    <p className="text-xs text-muted-foreground">{t("settings.presentationDesc")}</p>
-                  </div>
-                  <Button 
-                    variant={localStorage.getItem('kps-demo-mode') === 'true' ? 'default' : 'outline'}
-                    onClick={() => {
-                      const current = localStorage.getItem('kps-demo-mode') === 'true'
-                      localStorage.setItem('kps-demo-mode', current ? 'false' : 'true')
-                      window.location.reload()
-                    }}
-                  >
-                    {localStorage.getItem('kps-demo-mode') === 'true' ? t("settings.enabled") : t("settings.disabled")}
-                  </Button>
+                <h3 className="text-lg font-bold text-foreground">{t("settings.aboutTitle")}</h3>
+                <p className="text-xs text-muted-foreground font-mono">{t("settings.version")}</p>
+                <div className="flex gap-4 mt-4 mb-2 text-xs">
+                  <Button variant="link" size="sm">{t("settings.termsOfService")}</Button>
+                  <Button variant="link" size="sm">{t("settings.privacyPolicy")}</Button>
+                  <Button variant="link" size="sm">{t("settings.releaseNotes")}</Button>
                 </div>
               </CardContent>
             </Card>
@@ -177,11 +281,11 @@ export function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold capitalize">{activeTab.replace('-', ' ')}</h2>
+              <h2 className="text-xl font-bold capitalize text-foreground">{activeTab.replace('-', ' ')}</h2>
               <p className="text-sm text-muted-foreground">{t("settings.underConstruction", { tab: activeTab })}</p>
             </div>
-            <Card>
-              <CardContent className="p-12 flex items-center justify-center text-muted-foreground">
+            <Card className="rounded-xl border-border/80 shadow-2xs">
+              <CardContent className="p-12 flex items-center justify-center text-muted-foreground text-xs">
                 <p>{t("settings.underConstruction", { tab: activeTab })}</p>
               </CardContent>
             </Card>
@@ -191,33 +295,33 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-background">
-      <div className="p-6 border-b bg-card">
-        <h1 className="text-3xl font-bold tracking-tight">{t("settings.title")}</h1>
-        <p className="text-muted-foreground mt-1">{t("settings.subtitle")}</p>
+    <div className="h-full flex flex-col bg-background font-sans">
+      <div className="p-6 border-b border-border/80 bg-card">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("settings.title")}</h1>
+        <p className="text-xs text-muted-foreground mt-1">{t("settings.subtitle")}</p>
       </div>
 
       <div className="flex-1 min-h-0 flex flex-col md:flex-row">
         {/* Left Sidebar Tabs */}
-        <div className="w-full md:w-64 border-r bg-muted/20 p-4 space-y-1 overflow-y-auto">
+        <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-border/80 bg-muted/20 p-2 md:p-4 flex flex-row md:flex-col overflow-x-auto md:overflow-y-auto shrink-0 gap-1 space-y-0 md:space-y-1">
           {SETTINGS_TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 md:gap-3 px-3 py-2 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition-all ${
                 activeTab === tab.id 
-                  ? "bg-primary/10 text-primary" 
+                  ? "bg-primary text-primary-foreground font-semibold shadow-2xs" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-4 h-4 shrink-0" />
               {t(tab.label)}
             </button>
           ))}
-          <div className="pt-8 mt-8 border-t border-muted">
+          <div className="hidden md:block pt-8 mt-8 border-t border-border/60">
             <button
               onClick={logout}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LogOut className="w-4 h-4" />
               {t("settings.logout")}
@@ -226,7 +330,7 @@ export function SettingsPage() {
         </div>
 
         {/* Right Content Area */}
-        <div className="flex-1 p-6 md:p-8 overflow-y-auto bg-muted/5">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-muted/10">
           <div className="max-w-3xl">
             {renderContent()}
           </div>
@@ -241,43 +345,43 @@ function LanguageSettingsContent() {
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       <div>
-        <h2 className="text-xl font-semibold">{t("settings.language")}</h2>
+        <h2 className="text-xl font-bold text-foreground">{t("settings.language")}</h2>
         <p className="text-sm text-muted-foreground">{t("settings.languageDesc")}</p>
       </div>
-      <Card>
+      <Card className="rounded-xl border-border/80 shadow-2xs">
         <CardContent className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <button
               onClick={() => setLanguage("en")}
-              className={`p-4 rounded-sm border-2 text-left transition-all ${
+              className={`p-4 rounded-xl border-2 text-left transition-all ${
                 currentLang === "en"
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/50"
+                  ? "border-primary bg-primary/5 shadow-2xs"
+                  : "border-border hover:border-primary/40"
               }`}
             >
-              <span className="text-lg font-semibold">English</span>
-              <p className="text-sm text-muted-foreground mt-1">US English</p>
+              <span className="text-base font-bold text-foreground">English</span>
+              <p className="text-xs text-muted-foreground mt-1">Official English (US)</p>
               {currentLang === "en" && (
-                <div className="mt-2">
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">{t("settings.active")}</span>
+                <div className="mt-3">
+                  <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase">{t("settings.active")}</span>
                 </div>
               )}
             </button>
             <button
               onClick={() => setLanguage("kn")}
-              className={`p-4 rounded-sm border-2 text-left transition-all ${
+              className={`p-4 rounded-xl border-2 text-left transition-all ${
                 currentLang === "kn"
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/50"
+                  ? "border-primary bg-primary/5 shadow-2xs"
+                  : "border-border hover:border-primary/40"
               }`}
             >
-              <span className="text-lg font-semibold">ಕನ್ನಡ</span>
-              <p className="text-sm text-muted-foreground mt-1">Kannada</p>
+              <span className="text-base font-bold text-foreground">ಕನ್ನಡ</span>
+              <p className="text-xs text-muted-foreground mt-1">Kannada</p>
               {currentLang === "kn" && (
-                <div className="mt-2">
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-medium">{t("settings.active")}</span>
+                <div className="mt-3">
+                  <span className="text-[10px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-bold uppercase">{t("settings.active")}</span>
                 </div>
               )}
             </button>

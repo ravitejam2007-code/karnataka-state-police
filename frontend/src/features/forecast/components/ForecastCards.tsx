@@ -67,7 +67,7 @@ export function ForecastCards() {
       initial="hidden"
       animate="show"
     >
-      <CardWrapper onClick={() => navigate("/forecast")}>
+      <CardWrapper onClick={() => navigate("/app/forecast")}>
         <div className="absolute top-0 right-0 p-4 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity pointer-events-none">
           <TrendingUp className="w-16 h-16 text-primary" />
         </div>
@@ -107,7 +107,7 @@ export function ForecastCards() {
         <p className="text-[11px] text-muted-foreground mt-auto">Zones requiring immediate attention</p>
       </CardWrapper>
 
-      <CardWrapper onClick={() => navigate("/analytics")}>
+      <CardWrapper onClick={() => navigate("/app/analytics")}>
         <div className="absolute top-0 right-0 p-4 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity pointer-events-none">
           <ShieldAlert className="w-16 h-16 text-amber-500" />
         </div>
@@ -129,7 +129,7 @@ export function ForecastCards() {
         <p className="text-[11px] text-muted-foreground mt-auto">Anomalous spikes detected</p>
       </CardWrapper>
 
-      <CardWrapper onClick={() => navigate("/map?alerts=true")}>
+      <CardWrapper onClick={() => navigate("/app/map?alerts=true")}>
         <div className="absolute top-0 right-0 p-4 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity pointer-events-none">
           <AlertTriangle className="w-16 h-16 text-orange-500" />
         </div>

@@ -5,12 +5,9 @@ import { useTranslation } from "react-i18next"
 import {
   Shield,
   PhoneCall,
-  ChevronDown,
   Menu,
   X,
-  Clock,
   MapPin,
-  Users,
   BadgeCheck,
   FileText,
   Search,
@@ -20,12 +17,7 @@ import {
   Mail,
   ChevronRight,
   ChevronLeft,
-  Star,
   ArrowRight,
-  GraduationCap,
-  Scale,
-  Heart,
-  Building2,
 } from "lucide-react"
 import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
@@ -43,24 +35,11 @@ const serviceKeys = [
   { icon: Shield, titleKey: "policeVerification", descKey: "policeVerificationDesc" },
 ]
 
-const statKeys = [
-  { value: "112", labelKey: "emergencyHelpline", icon: PhoneCall },
-  { value: "24/7", labelKey: "policeResponse", icon: Clock },
-  { value: "30K+", labelKey: "policePersonnel", icon: Users },
-  { value: "30+", labelKey: "districtsCovered", icon: MapPin },
-]
-
 const newsKeys = [
   { date: "15 Jul 2026", titleKey: "item1Title", descKey: "item1Desc", tagKey: "item1Tag" },
   { date: "10 Jul 2026", titleKey: "item2Title", descKey: "item2Desc", tagKey: "item2Tag" },
   { date: "05 Jul 2026", titleKey: "item3Title", descKey: "item3Desc", tagKey: "item3Tag" },
   { date: "28 Jun 2026", titleKey: "item4Title", descKey: "item4Desc", tagKey: "item4Tag" },
-]
-
-const testimonialKeys = [
-  { quoteKey: "quote1", authorKey: "author1", locationKey: "location1" },
-  { quoteKey: "quote2", authorKey: "author2", locationKey: "location2" },
-  { quoteKey: "quote3", authorKey: "author3", locationKey: "location3" },
 ]
 
 const helplineKeys = [
@@ -72,49 +51,14 @@ const helplineKeys = [
   { nameKey: "antiCorruption", number: "1064" },
 ]
 
-const quickLinkKeys = [
-  { labelKey: "citizenCharter", icon: FileText },
-  { labelKey: "rti", icon: Scale },
-  { labelKey: "recruitment", icon: GraduationCap },
-  { labelKey: "gallery", icon: Star },
-  { labelKey: "downloadForms", icon: ArrowRight },
-  { labelKey: "tenders", icon: Building2 },
-]
 
-function TopBar() {
-  const { t } = useTranslation()
-
-  return (
-    <div className="bg-primary text-primary-foreground">
-      <div className="container mx-auto flex items-center justify-between px-4 py-1.5">
-        <div className="flex items-center gap-4 text-xs">
-          <a href="tel:112" className="flex items-center gap-1.5 hover:text-primary-foreground/80 transition-colors font-medium">
-            <PhoneCall className="h-3 w-3" />
-            <span>{t("landing.topbar.emergency")}</span>
-          </a>
-          <span className="hidden sm:inline-flex items-center gap-1 text-primary-foreground/60">
-            <Clock className="h-3 w-3" />
-            <span>{t("landing.topbar.helpline")}</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-3 text-xs">
-          <a href="#" className="hover:text-primary-foreground/80 transition-colors">{t("landing.topbar.visitor")}</a>
-          <span className="text-primary-foreground/30">|</span>
-          <a href="#main-content" className="hover:text-primary-foreground/80 transition-colors">{t("landing.topbar.skipToContent")}</a>
-          <span className="text-primary-foreground/30">|</span>
-          <LanguageSwitcher />
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function Navbar() {
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-xs">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-3">
@@ -129,10 +73,10 @@ function Navbar() {
           </div>
 
           <div className="hidden lg:flex items-center gap-1">
-            {["home", "aboutUs", "citizenServices", "statistics", "news", "contact"].map(key => (
+            {["home", "citizenServices", "news", "contact"].map(key => (
               <a
                 key={key}
-                href={`#${key === "home" ? "hero" : key === "aboutUs" ? "about" : key === "citizenServices" ? "services" : key === "statistics" ? "stats" : key === "news" ? "news" : "contact"}`}
+                href={`#${key === "home" ? "hero" : key === "citizenServices" ? "services" : key === "news" ? "news" : "contact"}`}
                 className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-foreground hover:bg-muted rounded-md transition-colors"
               >
                 {t(`landing.navbar.${key}`)}
@@ -140,7 +84,8 @@ function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-3">
+            <LanguageSwitcher />
             <Link to="/auth/login">
               <Button variant="outline" size="sm" className="border-primary/30 text-primary">
                 {t("landing.navbar.employeeLogin")}
@@ -172,27 +117,33 @@ function Navbar() {
             className="lg:hidden border-t border-gray-200 bg-white overflow-hidden"
           >
             <div className="container mx-auto px-4 py-4 space-y-3">
-              {["home", "aboutUs", "citizenServices", "statistics", "news", "contact"].map(key => (
+              {["home", "citizenServices", "news", "contact"].map(key => (
                 <a
                   key={key}
-                  href={`#${key === "home" ? "hero" : key === "aboutUs" ? "about" : key === "citizenServices" ? "services" : key === "statistics" ? "stats" : key === "news" ? "news" : "contact"}`}
+                  href={`#${key === "home" ? "hero" : key === "citizenServices" ? "services" : key === "news" ? "news" : "contact"}`}
                   onClick={() => setMobileOpen(false)}
                   className="block py-2 text-sm font-medium text-gray-700 hover:text-foreground"
                 >
                   {t(`landing.navbar.${key}`)}
                 </a>
               ))}
-              <div className="flex gap-2 pt-2 border-t border-gray-100">
-                <Link to="/auth/login" className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full border-primary/30 text-primary">
-                    {t("landing.navbar.employeeLogin")}
-                  </Button>
-                </Link>
-                <Link to="/auth/login" className="flex-1">
-                  <Button size="sm" className="w-full bg-primary text-primary-foreground">
-                    {t("landing.navbar.citizenLogin")}
-                  </Button>
-                </Link>
+              <div className="flex flex-col gap-2.5 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between py-1">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Language</span>
+                  <LanguageSwitcher />
+                </div>
+                <div className="flex gap-2">
+                  <Link to="/auth/login" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full border-primary/30 text-primary">
+                      {t("landing.navbar.employeeLogin")}
+                    </Button>
+                  </Link>
+                  <Link to="/auth/login" className="flex-1">
+                    <Button size="sm" className="w-full bg-primary text-primary-foreground">
+                      {t("landing.navbar.citizenLogin")}
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -215,8 +166,8 @@ function HeroSection() {
               <span className="text-xs font-medium text-white/90">{t("landing.hero.badge")}</span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              Suraksha Eva Seva
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
+              {t("landing.hero.title")}
             </h1>
             <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-4 max-w-xl">
               {t("landing.hero.subtitle")}
@@ -233,7 +184,7 @@ function HeroSection() {
                 </Button>
               </Link>
               <a href="#services">
-                <Button size="lg" variant="outline" className="border-primary-foreground/30 text-white hover:bg-primary-foreground/10 hover:text-white px-8">
+                <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/30 text-white hover:bg-white/10 hover:text-white transition-colors px-8">
                   {t("landing.hero.ctaExplore")}
                 </Button>
               </a>
@@ -258,54 +209,12 @@ function HeroSection() {
             <div className="bg-white/5 border border-white/10 rounded-sm p-8 max-w-sm">
               <img src={karnatakaEmblem} alt="Karnataka State Police Emblem" className="w-48 h-48 mx-auto object-contain opacity-90" />
               <div className="text-center mt-4 space-y-1">
-                <div className="text-2xl font-bold text-white">{t("landing.hero.title")}</div>
+                <div className="text-lg font-bold text-white">{t("landing.hero.emblemKSP")}</div>
                 <div className="text-xs text-white/60">{t("landing.hero.emblemGovt")}</div>
-                <div className="text-sm font-semibold text-white">{t("landing.hero.emblemKSP")}</div>
+                <div className="text-xs font-semibold text-white/80">Suraksha Eva Seva</div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function AboutSection() {
-  const { t } = useTranslation()
-
-  return (
-    <section id="about" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 rounded-full px-4 py-1.5 mb-4">
-            <Shield className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">{t("landing.about.badge")}</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            {t("landing.about.title")}
-          </h2>
-          <p className="text-gray-600 leading-relaxed">
-            {t("landing.about.subtitle")}
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { icon: Shield, titleKey: "mission", descKey: "missionDesc" },
-            { icon: Star, titleKey: "vision", descKey: "visionDesc" },
-            { icon: Heart, titleKey: "values", descKey: "valuesDesc" },
-          ].map((item) => {
-            const Icon = item.icon
-            return (
-              <Card key={item.titleKey} className="h-full p-8 border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all bg-white">
-                <div className="p-3 rounded-sm bg-primary/5 w-fit mb-5">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-primary mb-3">{t(`landing.about.${item.titleKey}`)}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{t(`landing.about.${item.descKey}`)}</p>
-              </Card>
-            )
-          })}
         </div>
       </div>
     </section>
@@ -332,7 +241,7 @@ function ServicesSection() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {serviceKeys.map((service, i) => {
+          {serviceKeys.map((service) => {
             const Icon = service.icon
             return (
               <Card key={service.titleKey} className="h-full p-6 border border-gray-200 hover:shadow-sm transition-all bg-white">
@@ -348,56 +257,6 @@ function ServicesSection() {
               </Card>
             )
           })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function StatisticsSection() {
-  const { t } = useTranslation()
-
-  return (
-    <section id="stats" className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            {t("landing.stats.title")}
-          </h2>
-          <p className="text-primary-foreground/70 leading-relaxed">
-            {t("landing.stats.subtitle")}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {statKeys.map((stat) => {
-            const Icon = stat.icon
-            return (
-              <div key={stat.labelKey} className="text-center">
-                <div className="p-4 rounded-full bg-white/5 border border-white/10 w-fit mx-auto mb-4">
-                  <Icon className="h-8 w-8 text-white" />
-                </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">{stat.value}</div>
-                <div className="text-sm text-primary-foreground/60">{t(`landing.stats.${stat.labelKey}`)}</div>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="mt-16 bg-white/5 border border-white/10 rounded-sm p-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              { value: "1,25,000+", labelKey: "firsRegistered" },
-              { value: "92%", labelKey: "resolutionRate" },
-              { value: "5,000+", labelKey: "cctvNetwork" },
-              { value: "24/7", labelKey: "emergencyResponse" },
-            ].map((item, i) => (
-              <div key={i}>
-                <div className="text-2xl font-bold text-white">{item.value}</div>
-                <div className="text-xs text-primary-foreground/60 mt-1">{t(`landing.stats.${item.labelKey}`)}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
@@ -469,136 +328,49 @@ function NewsSection() {
   )
 }
 
-function TestimonialsSection() {
-  const { t } = useTranslation()
-  const [active, setActive] = useState(0)
-
-  return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-muted border border-border rounded-full px-4 py-1.5 mb-4">
-            <Star className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("landing.testimonials.badge")}</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            {t("landing.testimonials.title")}
-          </h2>
-        </div>
-
-        <div className="max-w-3xl mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-gray-50 border border-gray-200 rounded-sm p-8 md:p-12 text-center"
-            >
-              <div className="text-5xl text-primary/10 font-serif mb-6">"</div>
-              <p className="text-lg text-gray-700 leading-relaxed italic mb-8">
-                {t(`landing.testimonials.${testimonialKeys[active].quoteKey}`)}
-              </p>
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <div className="text-left">
-                  <div className="font-semibold text-gray-900">{t(`landing.testimonials.${testimonialKeys[active].authorKey}`)}</div>
-                  <div className="text-xs text-gray-500">{t(`landing.testimonials.${testimonialKeys[active].locationKey}`)}</div>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="flex justify-center gap-2 mt-6">
-            {testimonialKeys.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActive(i)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  i === active ? "w-8 bg-foreground" : "w-2 bg-gray-300 hover:bg-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function HelplineSection() {
   const { t } = useTranslation()
 
   return (
-    <section id="contact" className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-20 bg-slate-50 border-t border-b border-slate-200/80 relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-sm px-4 py-1.5 mb-4">
-            <PhoneCall className="h-4 w-4 text-white" />
-            <span className="text-xs font-semibold text-white/90 uppercase tracking-wider">{t("landing.helplines.badge")}</span>
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 bg-slate-200/70 border border-slate-300 rounded-full px-3.5 py-1 mb-4">
+            <PhoneCall className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{t("landing.helplines.badge")}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 tracking-tight">
             {t("landing.helplines.title")}
           </h2>
-          <p className="text-primary-foreground/70 leading-relaxed">
+          <p className="text-slate-600 leading-relaxed text-sm md:text-base max-w-2xl mx-auto">
             {t("landing.helplines.subtitle")}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
-          {helplineKeys.map((h, i) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+          {helplineKeys.map((h) => (
             <a
               key={h.number}
               href={`tel:${h.number}`}
-              className="group text-center p-5 rounded-sm bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+              className="group flex flex-col justify-center text-center p-5 rounded-lg bg-white border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all h-full"
             >
-              <div className="p-3 rounded-full bg-white/10 w-fit mx-auto mb-3">
-                <PhoneCall className="h-5 w-5 text-white" />
+              <div className="p-3 rounded-full bg-slate-100 group-hover:bg-primary/10 transition-colors w-fit mx-auto mb-3">
+                <PhoneCall className="h-5 w-5 text-primary" />
               </div>
-              <div className="text-lg font-bold text-white mb-1">{h.number}</div>
-              <div className="text-[11px] text-white/60">{t(`landing.helplines.${h.nameKey}`)}</div>
+              <div className="text-xl font-bold text-slate-900 mb-1 group-hover:text-primary transition-colors">{h.number}</div>
+              <div className="text-xs text-slate-600 font-medium leading-snug">{t(`landing.helplines.${h.nameKey}`)}</div>
             </a>
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-sm text-primary-foreground/60">
+        <div className="mt-10 text-center">
+          <p className="text-xs sm:text-sm text-slate-600">
             {t("landing.helplines.generalInquiry")}{" "}
-            <a href="mailto:info@ksp.karnataka.gov.in" className="text-white hover:underline font-medium">
+            <a href="mailto:info@ksp.karnataka.gov.in" className="text-primary hover:underline font-semibold">
               info@ksp.karnataka.gov.in
             </a>{" "}
             {t("landing.helplines.orVisit")}
           </p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function QuickLinksSection() {
-  const { t } = useTranslation()
-
-  return (
-    <section className="py-16 bg-white border-b border-gray-200">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-          {quickLinkKeys.map((link) => {
-            const Icon = link.icon
-            return (
-              <a
-                key={link.labelKey}
-                href="#"
-                className="flex flex-col items-center gap-2 p-4 rounded-sm hover:bg-gray-50 hover:border-gray-300 border border-transparent transition-all group"
-              >
-                <div className="p-3 rounded-sm bg-primary/5 group-hover:bg-primary/10 transition-colors">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-xs font-medium text-gray-700 text-center leading-tight">{t(`landing.quickLinks.${link.labelKey}`)}</span>
-              </a>
-            )
-          })}
         </div>
       </div>
     </section>
@@ -638,7 +410,7 @@ function Footer() {
           <div className="space-y-4">
             <h5 className="text-xs font-bold uppercase tracking-wider text-white/80">{t("landing.footer.quickLinks")}</h5>
             <ul className="space-y-2.5 text-xs text-white/60">
-              {["home", "aboutUs", "citizenCharter", "rightToInfo", "recruitment", "tenders", "contactUs"].map(item => (
+              {["home", "citizenCharter", "rightToInfo", "recruitment", "tenders", "contactUs"].map(item => (
                 <li key={item}>
                   <a href="#" className="hover:text-white/80 transition-colors flex items-center gap-1.5 group">
                     <span className="h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
@@ -723,16 +495,11 @@ function Footer() {
 export function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans">
-      <TopBar />
       <Navbar />
       <HeroSection />
-      <AboutSection />
       <ServicesSection />
-      <StatisticsSection />
       <NewsSection />
-      <TestimonialsSection />
       <HelplineSection />
-      <QuickLinksSection />
       <Footer />
     </div>
   )

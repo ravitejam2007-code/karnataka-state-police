@@ -7,13 +7,14 @@ export function LanguageSwitcher() {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={toggleLanguage}
-      className="gap-1.5 text-xs font-medium"
+      className="gap-1.5 text-xs font-semibold border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-primary transition-colors shadow-xs"
+      title={currentLang === "kn" ? "Switch to English" : "ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಿ"}
     >
-      <Languages className="h-3.5 w-3.5" />
-      {currentLang === "kn" ? "EN" : "ಕನ್ನಡ"}
+      <Languages className="h-3.5 w-3.5 text-gray-500" />
+      <span>{currentLang === "kn" ? "English" : "ಕನ್ನಡ"}</span>
     </Button>
   )
 }

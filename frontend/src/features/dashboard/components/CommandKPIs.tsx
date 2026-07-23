@@ -27,7 +27,7 @@ function TrendBadge({ trend }: { trend: string }) {
   const Icon = arrow
 
   return (
-    <span className="inline-flex items-center gap-0.5 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+    <span className="inline-flex items-center gap-0.5 text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground">
       <Icon className="w-2.5 h-2.5" />
       {trend}
     </span>
@@ -51,20 +51,20 @@ export function CommandKPIs() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {kpis.map((kpi) => (
-        <Card key={kpi.label} className="bg-card border-border rounded-sm">
-          <CardContent className="p-4 flex items-start justify-between gap-3">
+        <Card key={kpi.label} className="bg-card border-border/80 rounded-xl shadow-2xs hover:border-border transition-all">
+          <CardContent className="p-3.5 flex items-start justify-between gap-2.5">
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1.5 truncate">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 truncate">
                 {kpi.label}
               </p>
               <div className="flex items-baseline gap-2 flex-wrap">
-                <h3 className={`font-mono tracking-tight text-foreground ${kpi.critical ? "text-2xl font-bold" : "text-xl font-semibold"}`}>
+                <h3 className={`font-mono tracking-tight text-foreground ${kpi.critical ? "text-xl font-bold" : "text-lg font-bold"}`}>
                   {kpi.value}
                 </h3>
                 <TrendBadge trend={kpi.trend} />
               </div>
             </div>
-            <div className="p-2 rounded-md shrink-0 bg-muted text-muted-foreground">
+            <div className="p-2 rounded-lg shrink-0 bg-primary/5 text-primary border border-primary/10">
               <kpi.icon className="h-4 w-4" />
             </div>
           </CardContent>

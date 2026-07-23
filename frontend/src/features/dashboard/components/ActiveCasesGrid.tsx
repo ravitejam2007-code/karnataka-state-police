@@ -1,11 +1,12 @@
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 import { ArrowUpRight } from "lucide-react"
 
 const cases = [
   {
     id: "KA-2026-891",
     title: "Cyber Financial Fraud",
-    officer: "Insp. Emma Parker",
+    officer: "Insp. R. Kumar",
     role: "Cyber Cell BLR",
     district: "Bengaluru Urban",
     badgeColor: "bg-red-500",
@@ -15,7 +16,7 @@ const cases = [
   {
     id: "KA-2026-442",
     title: "Organised Cargo Theft",
-    officer: "SI Sofia Martinez",
+    officer: "SI S. Martinez",
     role: "Crime Branch",
     district: "Mysuru South",
     badgeColor: "bg-amber-500",
@@ -25,7 +26,7 @@ const cases = [
   {
     id: "KA-2026-104",
     title: "Narcotics Interception",
-    officer: "DySP Arif Rahman",
+    officer: "DySP A. Rahman",
     role: "Special Task Force",
     district: "Mangaluru Coastal",
     badgeColor: "bg-red-500",
@@ -35,7 +36,7 @@ const cases = [
   {
     id: "KA-2026-773",
     title: "Vehicle Theft Ring",
-    officer: "Insp. Daniel Brooks",
+    officer: "Insp. D. Brooks",
     role: "Traffic Intelligence",
     district: "Hubballi-Dharwad",
     badgeColor: "bg-blue-500",
@@ -45,7 +46,7 @@ const cases = [
   {
     id: "KA-2026-309",
     title: "Identity Impersonation",
-    officer: "SI Hiro Tanaka",
+    officer: "SI H. Tanaka",
     role: "Digital Forensics",
     district: "Belagavi Central",
     badgeColor: "bg-slate-500",
@@ -55,7 +56,7 @@ const cases = [
   {
     id: "KA-2026-920",
     title: "ATM Tampering Syndicate",
-    officer: "Insp. Olivia Reed",
+    officer: "Insp. O. Reed",
     role: "Commercial Offence",
     district: "Shivamogga",
     badgeColor: "bg-amber-500",
@@ -66,16 +67,17 @@ const cases = [
 
 export function ActiveCasesGrid() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-bold text-foreground tracking-tight">{t("dashboard.activeCases")}</h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("dashboard.activeCases")}</h3>
           <p className="text-xs text-muted-foreground">{t("dashboard.activeCasesDesc")}</p>
         </div>
         <button 
-          onClick={() => window.location.href = '/cases'}
+          onClick={() => navigate('/app/cases')}
           className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
         >
           <span>{t("dashboard.viewAllDossiers")}</span>
@@ -87,13 +89,14 @@ export function ActiveCasesGrid() {
         {cases.map((c) => (
           <div
             key={c.id}
-            className="group p-4 rounded-xl bg-card border border-border/80 hover:border-border transition-all flex items-start gap-3 relative overflow-hidden"
+            onClick={() => navigate('/app/cases')}
+            className="group p-4 rounded-xl bg-card border border-border/80 hover:border-primary/40 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-start gap-3 relative overflow-hidden"
           >
             <div className="relative shrink-0">
-              <div className="h-10 w-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary">
+              <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary">
                 {c.officer.split(' ')[1]?.[0] || 'O'}
               </div>
-              <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ${c.badgeColor} border-2 border-card`} />
+              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${c.badgeColor} border-2 border-card`} />
             </div>
 
             <div className="flex-1 min-w-0">

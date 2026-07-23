@@ -1,35 +1,38 @@
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Zap, Siren, FileSearch, ShieldAlert, Fingerprint } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const actions = [
-  { label: "dashboard.initiateResponse", icon: Siren, variant: "destructive" as const },
-  { label: "dashboard.generateBrief", icon: Zap, variant: "default" as const },
-  { label: "dashboard.accessCctns", icon: FileSearch, variant: "outline" as const },
-  { label: "dashboard.issueBolo", icon: ShieldAlert, variant: "outline" as const },
-  { label: "dashboard.biometricQuery", icon: Fingerprint, variant: "outline" as const },
+  { label: "dashboard.initiateResponse", icon: Siren, route: "/app/cases", variant: "default" as const },
+  { label: "dashboard.generateBrief", icon: Zap, route: "/app/reports", variant: "outline" as const },
+  { label: "dashboard.accessCctns", icon: FileSearch, route: "/app/cases", variant: "outline" as const },
+  { label: "dashboard.issueBolo", icon: ShieldAlert, route: "/app/network", variant: "outline" as const },
+  { label: "dashboard.biometricQuery", icon: Fingerprint, route: "/app/ai", variant: "outline" as const },
 ]
 
 export function QuickActions() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   return (
-    <Card className="rounded-sm border-border bg-card h-full flex flex-col">
-      <CardHeader className="p-4 border-b border-border pb-3 bg-muted/50">
-        <CardTitle className="text-xs uppercase tracking-widest flex items-center">
-          <Zap className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+    <Card className="rounded-xl border-border/80 bg-card shadow-2xs h-full flex flex-col">
+      <CardHeader className="p-3.5 border-b border-border/80 pb-2.5 bg-muted/30">
+        <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center">
+          <Zap className="w-3.5 h-3.5 mr-2 text-primary" />
           {t("dashboard.tacticalActions")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 flex-1 flex flex-col gap-2 justify-center">
+      <CardContent className="p-3.5 flex-1 flex flex-col gap-2 justify-center">
         {actions.map((action) => (
           <Button 
             key={action.label} 
-            variant={action.variant} 
-            className="w-full justify-start text-xs h-9 uppercase tracking-wider font-semibold"
+            variant={action.variant}
+            onClick={() => navigate(action.route)}
+            className="w-full justify-start text-xs h-9 uppercase tracking-wider font-semibold hover:border-primary/40 transition-colors"
           >
-            <action.icon className="mr-2 h-4 w-4" />
+            <action.icon className="mr-2 h-3.5 w-3.5 text-primary" />
             {t(action.label)}
           </Button>
         ))}

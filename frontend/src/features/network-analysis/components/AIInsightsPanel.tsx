@@ -9,7 +9,7 @@ interface Props {
 
 export function AIInsightsPanel({ templates, activeTemplateId, onSelectTemplate }: Props) {
   return (
-    <div className="w-72 bg-slate-900 border-r border-slate-800 flex flex-col h-full overflow-hidden text-slate-300">
+    <div className="hidden lg:flex w-72 bg-slate-900 border-r border-slate-800 flex-col h-full overflow-hidden text-slate-300 shrink-0">
       
       <div className="p-4 border-b border-slate-800 bg-slate-800/30">
         <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">

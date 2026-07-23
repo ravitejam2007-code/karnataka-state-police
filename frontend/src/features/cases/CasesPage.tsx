@@ -110,7 +110,7 @@ export function CasesPage() {
   )
 
   return (
-    <div className="h-full flex flex-col space-y-6 p-6">
+    <div className="flex-1 flex flex-col space-y-6 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

@@ -26,7 +26,7 @@ export function ReportsPage() {
   const { t } = useTranslation()
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-8 overflow-y-auto bg-muted/5">
+    <div className="flex-1 flex flex-col space-y-8 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

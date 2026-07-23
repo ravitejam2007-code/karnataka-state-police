@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router-dom"
 import { Shield, PhoneCall, ExternalLink, Lock, CheckCircle2 } from "lucide-react"
 import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 
@@ -64,34 +65,34 @@ export function GovernmentFooter() {
             <h5 className="text-xs font-bold uppercase tracking-wider text-foreground">{t("footer.corePortals")}</h5>
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
-                <a href="/app/dashboard" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                <Link to="/app/dashboard" className="hover:text-primary transition-colors flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-primary" />
                   {t("footer.commandDashboard")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/app/map" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                <Link to="/app/map" className="hover:text-primary transition-colors flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-primary" />
                   {t("footer.predictiveMap")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/app/cases" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                <Link to="/app/cases" className="hover:text-primary transition-colors flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-primary" />
                   {t("footer.caseDossierSearch")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/app/ai" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                <Link to="/app/ai" className="hover:text-primary transition-colors flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-primary" />
                   {t("footer.aiAssistant")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/app/network" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                <Link to="/app/network" className="hover:text-primary transition-colors flex items-center gap-1.5">
                   <span className="h-1 w-1 rounded-full bg-primary" />
                   {t("footer.criminalNetwork")}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

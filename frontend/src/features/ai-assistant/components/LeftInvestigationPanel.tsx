@@ -14,7 +14,7 @@ const pinned = [
 
 export function LeftInvestigationPanel() {
   return (
-    <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-full overflow-hidden text-slate-300">
+    <div className="hidden lg:flex w-64 bg-slate-900 border-r border-slate-800 flex-col h-full overflow-hidden text-slate-300 shrink-0">
       <div className="p-4 border-b border-slate-800">
         <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white justify-start">
           <Plus className="h-4 w-4 mr-2" />

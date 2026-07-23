@@ -27,17 +27,17 @@ export function ForgotPassword() {
 
   return (
     <Card className="w-full shadow-sm border-t-2 border-t-primary">
-      <CardHeader className="space-y-2 text-center pb-8">
+      <CardHeader className="space-y-2 text-center px-4 sm:px-8 pb-6 pt-6 sm:pt-8">
         <div className="mx-auto bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-2">
           <KeyRound className="h-6 w-6 text-primary" />
         </div>
-        <CardTitle className="text-2xl">{t("auth.recoverAccess")}</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-xl sm:text-2xl font-bold">{t("auth.recoverAccess")}</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">
           {t("auth.recoverDesc")}
         </CardDescription>
       </CardHeader>
       
-      <CardContent>
+      <CardContent className="px-4 sm:px-8 pb-6">
         {!isSubmitted ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">

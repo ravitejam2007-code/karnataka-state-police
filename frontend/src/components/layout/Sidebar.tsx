@@ -33,7 +33,7 @@ const mainNav: NavItem[] = [
   { key: "predictiveMap", href: "/app/map", icon: Map },
   { key: "caseFiles", href: "/app/cases", icon: Briefcase },
   { key: "aiAssistant", href: "/app/ai", icon: Bot, badge: "AI" },
-  { key: "investigation", href: "/app/investigation", icon: FileSearch },
+  { key: "investigation", href: "/app/cases", icon: FileSearch },
 ]
 
 const intelNav: NavItem[] = [
@@ -44,15 +44,25 @@ const intelNav: NavItem[] = [
 ]
 
 const adminNav: NavItem[] = [
-  { key: "administration", href: "/app/admin", icon: ShieldAlert },
+  { key: "administration", href: "/app/settings", icon: ShieldAlert },
 ]
 
 const bottomNav: NavItem[] = [
   { key: "settings", href: "/app/settings", icon: Settings },
-  { key: "helpDocs", href: "/app/help", icon: HelpCircle },
+  { key: "helpDocs", href: "/app/settings", icon: HelpCircle },
 ]
 
-function CollapsibleSection({ title, items, defaultOpen = true }: { title: string; items: NavItem[]; defaultOpen?: boolean }) {
+function CollapsibleSection({ 
+  title, 
+  items, 
+  defaultOpen = true,
+  onItemClick 
+}: { 
+  title: string; 
+  items: NavItem[]; 
+  defaultOpen?: boolean;
+  onItemClick?: () => void;
+}) {
   const [open, setOpen] = useState(defaultOpen)
   const { t } = useTranslation()
 
@@ -71,6 +81,7 @@ function CollapsibleSection({ title, items, defaultOpen = true }: { title: strin
             <NavLink
               key={item.key}
               to={item.href}
+              onClick={onItemClick}
               className={({ isActive }) =>
                 cn(
                   "group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-all",
@@ -111,7 +122,7 @@ function CollapsibleSection({ title, items, defaultOpen = true }: { title: strin
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ onClose }: { onClose?: () => void }) {
   const { t } = useTranslation()
 
   return (
@@ -138,9 +149,9 @@ export function Sidebar() {
 
       {/* Navigation Links */}
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3">
-        <CollapsibleSection title={t("sidebar.coreOperations")} items={mainNav} />
-        <CollapsibleSection title={t("sidebar.intelligence")} items={intelNav} />
-        <CollapsibleSection title={t("sidebar.administration")} items={adminNav} defaultOpen={false} />
+        <CollapsibleSection title={t("sidebar.coreOperations")} items={mainNav} onItemClick={onClose} />
+        <CollapsibleSection title={t("sidebar.intelligence")} items={intelNav} onItemClick={onClose} />
+        <CollapsibleSection title={t("sidebar.administration")} items={adminNav} defaultOpen={false} onItemClick={onClose} />
       </div>
 
       {/* Bottom Dispatch / Helpdesk Card */}
@@ -156,7 +167,10 @@ export function Sidebar() {
             </div>
           </div>
           <button
-            onClick={() => alert("Connecting to 112 Control Desk...")}
+            onClick={() => {
+              onClose?.()
+              alert("Connecting to 112 Control Desk...")
+            }}
             className="w-full py-1.5 px-3 rounded-md bg-destructive text-destructive-foreground text-xs font-medium hover:bg-destructive/90 transition-colors shadow-sm flex items-center justify-center gap-1.5"
           >
             <PhoneCall className="h-3 w-3" />
@@ -169,6 +183,7 @@ export function Sidebar() {
             <NavLink
               key={item.key}
               to={item.href}
+              onClick={onClose}
               className={({ isActive }) =>
                 cn(
                   "group flex items-center rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
