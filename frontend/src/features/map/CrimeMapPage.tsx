@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react"
-import { MapFilters } from "./components/MapFilters"
+import { useLanguage } from "@/hooks/useLanguage"
 import { CrimeMap } from "./components/CrimeMap"
 import { MOCK_INCIDENTS, MOCK_POLICE_STATIONS } from "./mockData"
 import type { MapFilterState } from "./types"
-import { Map, Layers, RefreshCcw } from "lucide-react"
+import { 
+  Map as MapIcon, 
+  Layers, 
+  RefreshCcw, 
+  Search, 
+  Flame, 
+  Building2, 
+  SlidersHorizontal
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ContextualLoader } from "@/components/ui/contextual-loader"
 import { motion, AnimatePresence } from "framer-motion"
-import { useTranslation } from "react-i18next"
 
 export function CrimeMapPage() {
+  const { isKannada } = useLanguage()
   const [filters, setFilters] = useState<MapFilterState>({
     crimeType: "All",
     severity: "All",
@@ -20,12 +29,14 @@ export function CrimeMapPage() {
     showPoliceStations: true,
     showBoundaries: true,
   })
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showFilterDrawer, setShowFilterDrawer] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const { t } = useTranslation()
 
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 2000)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setIsLoading(false), 1200)
+    return () => clearTimeout(timer)
   }, [])
 
   const handleReset = () => {
@@ -39,96 +50,177 @@ export function CrimeMapPage() {
       showPoliceStations: true,
       showBoundaries: true,
     })
+    setSearchQuery("")
   }
 
+  const filteredIncidents = MOCK_INCIDENTS.filter(inc => {
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      return inc.type.toLowerCase().includes(q) || 
+             inc.district.toLowerCase().includes(q) || 
+             inc.description.toLowerCase().includes(q)
+    }
+    return true
+  })
+
   return (
-    <div className="flex-1 flex flex-col space-y-6 pb-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Map className="h-8 w-8 text-foreground" />
-            {t("map.title")}
-          </h1>
-          <p className="text-muted-foreground mt-1">{t("map.subtitle")}</p>
+    <div className="flex-1 flex flex-col h-full bg-[#F8FAFC] font-sans relative overflow-hidden">
+      {/* Top GIS Floating Command Header */}
+      <div className="bg-white border-b border-[#E2E8F0] px-4 py-3 shadow-2xs z-20 shrink-0 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-lg bg-[#2563EB]/10 border border-[#2563EB]/30 flex items-center justify-center text-[#2563EB]">
+            <MapIcon className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-[#1E293B] leading-tight flex items-center gap-2">
+              {isKannada ? "ಅಪರಾಧ ಮುನ್ಸೂಚನೆ ಜಿಐಎಸ್ ಭೂಪಟ" : "Statewide Predictive Crime GIS Dashboard"}
+            </h1>
+            <span className="text-[11px] text-[#64748B]">
+              {isKannada ? "ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಭೌಗೋಳಿಕ ಮಾಹಿತಿ ವ್ಯವಸ್ಥೆ" : "Karnataka Police Spatial Intelligence & GIS Unit"}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleReset}>
-            <RefreshCcw className="mr-2 h-4 w-4" />
-            {t("map.resetMap")}
+
+        {/* Floating Quick Action Controls */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Quick Search */}
+          <div className="relative w-48 sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#64748B]" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isKannada ? "ಜಿಲ್ಲೆ / ಅಪರಾಧ ಹುಡುಕಿ..." : "Search District or Crime..."}
+              className="pl-8 h-8 text-xs bg-[#F8FAFC] border-[#E2E8F0]"
+            />
+          </div>
+
+          <Button
+            variant={showFilterDrawer ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => setShowFilterDrawer(!showFilterDrawer)}
+            className="h-8 text-xs border-[#E2E8F0] text-[#1E293B] gap-1.5"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5 text-[#2563EB]" />
+            <span>{isKannada ? "ಫಿಲ್ಟರ್‌ಗಳು" : "GIS Controls"}</span>
           </Button>
-          <Button>
-            <Layers className="mr-2 h-4 w-4" />
-            {t("map.exportData")}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleReset}
+            className="h-8 text-xs border-[#E2E8F0] text-[#1E293B] gap-1"
+          >
+            <RefreshCcw className="h-3.5 w-3.5 text-[#64748B]" />
+            <span>{isKannada ? "ಮರುಹೊಂದಿಸಿ" : "Reset"}</span>
           </Button>
         </div>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-6">
+      {/* Full-Screen GIS Map Viewport */}
+      <div className="flex-1 relative w-full h-full min-h-[550px] overflow-hidden">
         
-        {/* Sidebar Filters */}
-        <div className="w-full md:w-80 flex-shrink-0 bg-card border rounded-sm overflow-y-auto">
-          <div className="p-4 border-b bg-muted/20">
-            <h2 className="font-semibold flex items-center gap-2">
-              <FilterIcon className="h-4 w-4 text-muted-foreground" />
-              {t("map.mapControls")}
-            </h2>
-          </div>
-          <MapFilters filters={filters} setFilters={setFilters} />
-        </div>
+        {/* Floating Collapsible Controls Card */}
+        <AnimatePresence>
+          {showFilterDrawer && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="absolute top-4 left-4 z-30 w-72 bg-white/95 backdrop-blur border border-[#E2E8F0] rounded-xl shadow-lg p-4 space-y-4 font-sans text-xs text-[#1E293B]"
+            >
+              <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2 font-bold uppercase tracking-wider text-[11px]">
+                <span className="flex items-center gap-1.5 text-[#2563EB]">
+                  <Layers className="h-4 w-4" /> Layer Visibility
+                </span>
+                <button onClick={() => setShowFilterDrawer(false)} className="text-[#64748B] hover:text-[#1E293B]">✕</button>
+              </div>
+
+              {/* Layer Toggles */}
+              <div className="space-y-2">
+                <label className="flex items-center justify-between p-2 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] cursor-pointer">
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Flame className="h-4 w-4 text-red-600" />
+                    Heatmap Layer
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={filters.showHeatmap}
+                    onChange={(e) => setFilters(f => ({ ...f, showHeatmap: e.target.checked }))}
+                    className="accent-[#2563EB]"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-2 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] cursor-pointer">
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Layers className="h-4 w-4 text-[#2563EB]" />
+                    Marker Clusters
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={filters.showClusters}
+                    onChange={(e) => setFilters(f => ({ ...f, showClusters: e.target.checked }))}
+                    className="accent-[#2563EB]"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between p-2 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] cursor-pointer">
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Building2 className="h-4 w-4 text-[#2563EB]" />
+                    Police Stations
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={filters.showPoliceStations}
+                    onChange={(e) => setFilters(f => ({ ...f, showPoliceStations: e.target.checked }))}
+                    className="accent-[#2563EB]"
+                  />
+                </label>
+              </div>
+
+              {/* Severity Filter */}
+              <div className="space-y-1.5 pt-2 border-t border-[#E2E8F0]">
+                <span className="font-bold text-[10px] uppercase text-[#64748B]">Crime Severity</span>
+                <select
+                  value={filters.severity}
+                  onChange={(e) => setFilters(f => ({ ...f, severity: e.target.value }))}
+                  className="w-full p-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#1E293B]"
+                >
+                  <option value="All">All Priority Levels</option>
+                  <option value="High">High Priority</option>
+                  <option value="Medium">Medium Priority</option>
+                  <option value="Low">Low Priority</option>
+                </select>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Map Container */}
-        <div className="flex-1 bg-muted/10 rounded-sm relative min-h-[500px] overflow-hidden">
-          <AnimatePresence mode="wait">
-            {isLoading ? (
-              <motion.div 
-                key="loader"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center bg-card z-10"
-              >
-                <ContextualLoader icon={Map} message={t("map.loading")} />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="map"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="h-full w-full"
-              >
-                <CrimeMap 
-                  incidents={MOCK_INCIDENTS} 
-                  policeStations={MOCK_POLICE_STATIONS} 
-                  filters={filters} 
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {isLoading ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+            <ContextualLoader icon={MapIcon} message={isKannada ? "ಜಿಐಎಸ್ ನಕ್ಷೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ..." : "Initializing Professional Police GIS Layer..."} />
+          </div>
+        ) : (
+          <CrimeMap
+            incidents={filteredIncidents}
+            policeStations={MOCK_POLICE_STATIONS}
+            filters={filters}
+          />
+        )}
+
+        {/* Floating Bottom Left Telemetry Status */}
+        <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur border border-[#E2E8F0] px-3.5 py-2 rounded-lg shadow-md flex items-center gap-4 text-[11px] text-[#475569] font-mono">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-bold text-[#1E293B]">GIS Live Telemetry</span>
+          </div>
+          <span className="text-[#CBD5E1]">|</span>
+          <div>Total Incidents: <strong className="text-[#2563EB]">{filteredIncidents.length}</strong></div>
+          <span className="text-[#CBD5E1]">|</span>
+          <div>Lat/Lng: 15.3173° N, 75.7139° E</div>
         </div>
 
       </div>
     </div>
-  )
-}
-
-function FilterIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-    </svg>
   )
 }

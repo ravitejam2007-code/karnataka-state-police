@@ -12,7 +12,7 @@ interface GovernmentHeaderProps {
 }
 
 export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
-  const { user, activeRole, logout } = useAuthStore()
+  const { user, logout } = useAuthStore()
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -39,21 +39,21 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-primary text-primary-foreground font-sans">
+    <header className="sticky top-0 z-50 w-full border-b border-[#E2E8F0] bg-white text-[#1E293B] font-sans shadow-2xs">
       <div className="container mx-auto flex h-14 items-center justify-between px-4 gap-2">
         {/* Branding Area */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-primary-foreground hover:bg-primary-foreground/10"
+            className="text-[#1E293B] hover:bg-slate-100 shrink-0 cursor-pointer"
             onClick={onMenuClick}
             aria-label="Toggle Menu"
           >
             <Menu className="h-5 w-5" />
             <span className="sr-only">{t("header.toggleMenu")}</span>
           </Button>
-          <div className="p-1 bg-white/95 rounded-md shadow-2xs border border-white/20 shrink-0">
+          <div className="p-1 bg-white rounded-md shadow-2xs border border-slate-200 shrink-0">
             <img
               src={karnatakaEmblem}
               alt="Karnataka State Police Emblem"
@@ -61,11 +61,11 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
             />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-[9px] font-semibold tracking-wider text-secondary uppercase leading-none">
+            <span className="text-[9px] font-bold tracking-wider text-[#64748B] uppercase leading-none">
               {t("header.governmentOfKarnataka")}
             </span>
-            <h1 className="text-sm font-bold tracking-tight leading-tight">{t("header.ksp")}</h1>
-            <span className="text-[9px] text-primary-foreground/70 hidden sm:inline-block leading-tight">
+            <h1 className="text-sm font-bold tracking-tight text-[#1E293B] leading-tight">{t("header.ksp")}</h1>
+            <span className="text-[9px] text-[#64748B] font-medium hidden sm:inline-block leading-tight">
               {t("header.scrb")}
             </span>
           </div>
@@ -75,11 +75,11 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
         <div className="hidden md:flex flex-1 max-w-lg mx-2 lg:mx-4">
           <button
             onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
-            className="w-full bg-primary-foreground/10 hover:bg-primary-foreground/20 border border-primary-foreground/20 text-primary-foreground/60 transition-colors flex items-center gap-2 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-secondary text-sm"
+            className="w-full bg-[#F8FAFC] hover:bg-[#F1F5F9] border border-[#E2E8F0] text-[#64748B] transition-colors flex items-center gap-2 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E3A8A] text-sm"
           >
-            <Search className="h-4 w-4 shrink-0" />
+            <Search className="h-4 w-4 shrink-0 text-[#64748B]" />
             <span className="flex-1 text-left truncate">{t("header.searchPlaceholder")}</span>
-            <kbd className="hidden lg:inline-flex items-center gap-1 rounded border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 font-mono text-[10px] font-medium text-primary-foreground/70">
+            <kbd className="hidden lg:inline-flex items-center gap-1 rounded border border-[#E2E8F0] bg-white px-1.5 font-mono text-[10px] font-medium text-[#64748B]">
               <span className="text-xs">⌘</span>K
             </kbd>
           </button>
@@ -89,8 +89,8 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           <Button
             size="sm"
-            className="hidden xl:flex items-center gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold shadow-2xs text-xs px-3"
-            onClick={() => navigate("/app/cases")}
+            className="hidden xl:flex items-center gap-1.5 bg-[#2563EB] text-white hover:bg-[#1D4ED8] font-semibold shadow-2xs text-xs px-3 cursor-pointer"
+            onClick={() => navigate("/app/investigation")}
           >
             <PlusCircle className="h-4 w-4" />
             <span>{t("header.newInvestigation")}</span>
@@ -101,36 +101,36 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="relative text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground/80"
+            className="relative text-[#64748B] hover:bg-slate-100 hover:text-[#1E293B]"
           >
             <Bell className="h-4 w-4" />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-emerald-400 border-2 border-primary animate-pulse" />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-blue-600 border-2 border-white animate-pulse" />
           </Button>
 
-          <div className="h-5 w-px bg-primary-foreground/20 mx-0.5" />
+          <div className="h-5 w-px bg-[#E2E8F0] mx-0.5" />
 
           {/* Profile Dropdown Container */}
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 p-1 rounded-lg hover:bg-primary-foreground/10 transition-colors focus:outline-none focus:ring-1 focus:ring-secondary text-left group"
+              className="flex items-center gap-2 p-1 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none focus:ring-1 focus:ring-[#1E3A8A] text-left group"
             >
               {user?.avatar ? (
                 <img 
                   src={user.avatar} 
                   alt={user.name} 
-                  className="h-8 w-8 rounded-full object-cover border border-primary-foreground/30 shadow-2xs shrink-0" 
+                  className="h-8 w-8 rounded-full object-cover border border-[#E2E8F0] shadow-2xs shrink-0" 
                 />
               ) : (
-                <div className="h-8 w-8 rounded-full bg-secondary text-secondary-foreground font-extrabold text-xs font-mono flex items-center justify-center border border-white/20 shrink-0">
+                <div className="h-8 w-8 rounded-full bg-[#1E3A8A] text-white font-extrabold text-xs font-mono flex items-center justify-center border border-white shrink-0">
                   {getInitials(user?.name || "Officer")}
                 </div>
               )}
               <div className="hidden sm:block text-right leading-tight max-w-[130px]">
-                <span className="text-xs font-bold leading-tight block truncate text-primary-foreground">{user?.name || "Officer"}</span>
-                <span className="text-[9px] text-primary-foreground/70 leading-tight block truncate">{activeRole || "Investigator"}</span>
+                <span className="text-xs font-bold leading-tight block truncate text-[#1E293B]">{user?.name || "User"}</span>
+                <span className="text-[9px] text-[#64748B] leading-tight block truncate">{user?.role || "Citizen"}</span>
               </div>
-              <ChevronDown className="h-3.5 w-3.5 text-primary-foreground/70 group-hover:text-primary-foreground transition-transform" />
+              <ChevronDown className="h-3.5 w-3.5 text-[#64748B] group-hover:text-[#1E293B] transition-transform" />
             </button>
 
             {/* Profile Dropdown Menu */}
@@ -146,7 +146,7 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
                     />
                   ) : (
                     <div className="h-11 w-11 rounded-full bg-primary/10 border-2 border-primary/30 text-primary font-bold text-sm font-mono flex items-center justify-center shrink-0">
-                      {getInitials(user?.name || "Officer")}
+                      {getInitials(user?.name || "User")}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
@@ -163,8 +163,12 @@ export function GovernmentHeader({ onMenuClick }: GovernmentHeaderProps) {
                     <span className="truncate max-w-[150px] text-right font-medium">{user?.department || "State Crime Bureau"}</span>
                   </div>
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-semibold text-foreground">Active Role:</span>
-                    <span className="font-semibold text-primary">{activeRole || "Investigator"}</span>
+                    <span className="font-semibold text-foreground">RBAC Role:</span>
+                    <span className="font-bold text-primary">{user?.role || "Citizen"}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] pt-1 border-t border-border/40">
+                    <span className="font-semibold text-foreground">JWT Auth Session:</span>
+                    <span className="font-mono text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">Active Token</span>
                   </div>
                 </div>
 

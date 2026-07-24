@@ -197,26 +197,26 @@ export function CrimeMap({ incidents, policeStations, filters }: CrimeMapProps) 
       </MapContainer>
       
       {/* Legend Overlay */}
-      <div className="absolute bottom-6 right-6 z-10 bg-card p-3 rounded-lg shadow-lg border text-sm">
-        <h4 className="font-semibold mb-2">Legend</h4>
-        <div className="space-y-1.5">
+      <div className="absolute bottom-6 right-6 z-20 bg-white/95 backdrop-blur p-3.5 rounded-xl shadow-lg border border-[#E2E8F0] text-xs text-[#1E293B] font-sans min-w-[170px]">
+        <h4 className="font-bold text-[11px] uppercase tracking-wider text-[#64748B] mb-2.5 border-b border-[#E2E8F0] pb-1">GIS Symbology Legend</h4>
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-            <span>High Severity</span>
+            <div className="w-3 h-3 rounded-full bg-red-600 animate-pulse border border-white shadow-2xs"></div>
+            <span className="font-semibold text-red-700">High Priority Incident</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></div>
-            <span>Medium Severity</span>
+            <div className="w-3 h-3 rounded-full bg-amber-500 border border-white shadow-2xs"></div>
+            <span className="font-medium text-amber-700">Medium Priority</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span>Low Severity</span>
+            <div className="w-3 h-3 rounded-full bg-emerald-600 border border-white shadow-2xs"></div>
+            <span className="font-medium text-emerald-700">Low Priority</span>
           </div>
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t">
-            <div className="w-4 h-4 rounded bg-blue-700 flex items-center justify-center">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-[#E2E8F0]">
+            <div className="w-4 h-4 rounded bg-[#2563EB] text-white flex items-center justify-center font-bold text-[9px] shadow-2xs">
+              PS
             </div>
-            <span>Police Station</span>
+            <span className="font-semibold text-[#1E293B]">Police Station HQ</span>
           </div>
         </div>
       </div>

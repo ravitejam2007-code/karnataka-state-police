@@ -60,7 +60,7 @@ export function MainLayout() {
       </div>
       
       <div className="flex flex-1 overflow-hidden relative">
-        {/* Mobile Sidebar Overlay */}
+        {/* Mobile Backdrop Overlay */}
         <AnimatePresence>
           {isSidebarOpen && (
             <motion.div 
@@ -68,13 +68,15 @@ export function MainLayout() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsSidebarOpen(false)}
-              className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 bg-slate-900/40 z-40"
             />
           )}
         </AnimatePresence>
 
-        {/* Sidebar */}
-        <aside className={`fixed md:static inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out bg-card ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} shrink-0 mt-[56px] md:mt-0 h-[calc(100vh-56px)] md:h-full`}>
+        {/* Collapsible Sidebar */}
+        <aside className={`transition-all duration-300 ease-in-out z-50 bg-card shrink-0 h-full overflow-hidden ${
+          isSidebarOpen ? "w-64 opacity-100 border-r border-[#E2E8F0]" : "w-0 opacity-0 border-none"
+        }`}>
           <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </aside>
 

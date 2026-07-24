@@ -13,15 +13,15 @@ export function ExecutiveSummaryWidget({ data }: Props) {
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-slate-800 border border-slate-700 rounded-md overflow-hidden mb-4"
+      className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden mb-4 shadow-2xs font-sans"
     >
-      <div className="bg-slate-900/50 border-b border-slate-700 px-4 py-2 flex items-center gap-2">
-        <FileText className="h-4 w-4 text-blue-400" />
-        <h3 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">Executive Summary</h3>
+      <div className="bg-[#F8FAFC] border-b border-[#E2E8F0] px-4 py-2.5 flex items-center gap-2">
+        <FileText className="h-4 w-4 text-[#2563EB]" />
+        <h3 className="text-xs font-bold text-[#1E293B] tracking-wider uppercase">Executive Summary</h3>
       </div>
       <div className="p-4">
-        <h4 className="text-lg font-medium text-slate-100 mb-2">{data.title}</h4>
-        <p className="text-slate-300 text-sm leading-relaxed">
+        <h4 className="text-sm font-bold text-[#1E293B] mb-1.5">{data.title}</h4>
+        <p className="text-[#475569] text-xs leading-relaxed">
           {data.summary}
         </p>
       </div>

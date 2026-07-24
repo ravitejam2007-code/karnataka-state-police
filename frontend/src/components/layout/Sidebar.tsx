@@ -10,8 +10,6 @@ import {
   TrendingUp,
   FileText,
   ShieldAlert,
-  Settings,
-  HelpCircle,
   Briefcase,
   ChevronDown,
   PhoneCall,
@@ -19,7 +17,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
-import karnatakaEmblem from "@/assets/karnataka-emblem.png"
+import { useAuthStore } from "@/store/useAuthStore"
 
 interface NavItem {
   key: string
@@ -33,7 +31,7 @@ const mainNav: NavItem[] = [
   { key: "predictiveMap", href: "/app/map", icon: Map },
   { key: "caseFiles", href: "/app/cases", icon: Briefcase },
   { key: "aiAssistant", href: "/app/ai", icon: Bot, badge: "AI" },
-  { key: "investigation", href: "/app/cases", icon: FileSearch },
+  { key: "investigation", href: "/app/investigation", icon: FileSearch },
 ]
 
 const intelNav: NavItem[] = [
@@ -45,11 +43,6 @@ const intelNav: NavItem[] = [
 
 const adminNav: NavItem[] = [
   { key: "administration", href: "/app/settings", icon: ShieldAlert },
-]
-
-const bottomNav: NavItem[] = [
-  { key: "settings", href: "/app/settings", icon: Settings },
-  { key: "helpDocs", href: "/app/settings", icon: HelpCircle },
 ]
 
 function CollapsibleSection({ 
@@ -70,7 +63,7 @@ function CollapsibleSection({
     <div>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-semibold text-muted-foreground tracking-wider uppercase hover:text-foreground transition-colors"
+        className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-bold text-muted-foreground tracking-wider uppercase hover:text-foreground transition-colors"
       >
         <span>{title}</span>
         {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -84,10 +77,10 @@ function CollapsibleSection({
               onClick={onItemClick}
               className={({ isActive }) =>
                 cn(
-                  "group flex items-center justify-between rounded-md px-3 py-2 text-xs font-medium transition-all",
+                  "group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-all",
                   isActive
-                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-[#2563EB] text-white font-semibold shadow-xs"
+                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#1E293B]"
                 )
               }
             >
@@ -97,21 +90,11 @@ function CollapsibleSection({
                     <item.icon
                       className={cn(
                         "mr-2.5 h-4 w-4 flex-shrink-0 transition-colors",
-                        isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+                        isActive ? "text-white" : "text-[#64748B] group-hover:text-[#1E293B]"
                       )}
                     />
                     <span>{t(`sidebar.${item.key}`)}</span>
                   </div>
-                  {item.badge && (
-                    <span
-                      className={cn(
-                        "text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full",
-                        isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/10 text-primary"
-                      )}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
                 </>
               )}
             </NavLink>
@@ -124,46 +107,61 @@ function CollapsibleSection({
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
   const { t } = useTranslation()
+  const { user } = useAuthStore()
+  const currentRole = user?.role || "Citizen"
+
+  // Role-based navigation filtering helper
+  const isItemAllowed = (href: string) => {
+    if (currentRole === "Administrator") return true
+    if (href === "/app/dashboard" || href === "/app/cases" || href === "/app/investigation") return true
+
+    if (href === "/app/map") {
+      return ["Police Officer", "Investigator", "Supervisor"].includes(currentRole)
+    }
+    if (href === "/app/ai") {
+      return ["Police Officer", "Investigator", "Analyst", "Supervisor"].includes(currentRole)
+    }
+    if (href === "/app/analytics" || href === "/app/forecast" || href === "/app/reports") {
+      return ["Analyst", "Investigator", "Supervisor", "Policy Maker"].includes(currentRole)
+    }
+    if (href === "/app/network") {
+      return ["Investigator", "Analyst", "Supervisor"].includes(currentRole)
+    }
+    if (href === "/app/settings") {
+      return ["Supervisor"].includes(currentRole)
+    }
+    return false
+  }
+
+  const filteredMainNav = mainNav.filter(item => isItemAllowed(item.href))
+  const filteredIntelNav = intelNav.filter(item => isItemAllowed(item.href))
+  const filteredAdminNav = adminNav.filter(item => isItemAllowed(item.href))
 
   return (
-    <div className="flex h-full w-64 flex-col border-r bg-card text-card-foreground shadow-xs">
-      {/* Top Workspace Selector */}
-      <div className="p-3 border-b border-border/60">
-        <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border/50 hover:bg-muted transition-colors cursor-pointer group">
-          <div className="flex items-center gap-2.5 overflow-hidden">
-            <img
-              src={karnatakaEmblem}
-              alt="Karnataka Emblem"
-              className="h-7 w-auto object-contain shrink-0"
-            />
-            <div className="flex flex-col text-left">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-none">
-                {t("sidebar.commandPost")}
-              </span>
-              <span className="text-xs font-bold text-foreground leading-tight truncate">{t("sidebar.centralZone")}</span>
-            </div>
-          </div>
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground shrink-0 transition-transform" />
-        </div>
-      </div>
-
-      {/* Navigation Links */}
+    <div className="flex h-full w-64 flex-col border-r border-[#E2E8F0] bg-white text-[#1E293B] font-sans">
+      {/* Navigation Links directly at top - Officer Card Removed */}
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3">
-        <CollapsibleSection title={t("sidebar.coreOperations")} items={mainNav} onItemClick={onClose} />
-        <CollapsibleSection title={t("sidebar.intelligence")} items={intelNav} onItemClick={onClose} />
-        <CollapsibleSection title={t("sidebar.administration")} items={adminNav} defaultOpen={false} onItemClick={onClose} />
+        {filteredMainNav.length > 0 && (
+          <CollapsibleSection title={t("sidebar.coreOperations")} items={filteredMainNav} onItemClick={onClose} />
+        )}
+        {filteredIntelNav.length > 0 && (
+          <CollapsibleSection title={t("sidebar.intelligence")} items={filteredIntelNav} onItemClick={onClose} />
+        )}
+        {filteredAdminNav.length > 0 && (
+          <CollapsibleSection title={t("sidebar.administration")} items={filteredAdminNav} defaultOpen={false} onItemClick={onClose} />
+        )}
       </div>
 
-      {/* Bottom Dispatch / Helpdesk Card */}
-      <div className="p-3 border-t border-border/60 space-y-2">
-        <div className="rounded-lg p-3 bg-muted border border-border space-y-2">
+      {/* Bottom Dispatch Card */}
+      <div className="p-3 border-t border-[#E2E8F0]">
+        <div className="rounded-lg p-3 bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-md bg-destructive text-destructive-foreground">
+            <div className="p-1.5 rounded-md bg-red-600 text-white">
               <PhoneCall className="h-3.5 w-3.5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-foreground leading-tight">{t("sidebar.ershHotline")}</span>
-              <span className="text-[9px] text-muted-foreground">{t("sidebar.stateDispatch")}</span>
+              <span className="text-xs font-bold text-[#1E293B] leading-tight">{t("sidebar.ershHotline")}</span>
+              <span className="text-[9px] text-[#64748B]">{t("sidebar.stateDispatch")}</span>
             </div>
           </div>
           <button
@@ -171,33 +169,12 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
               onClose?.()
               alert("Connecting to 112 Control Desk...")
             }}
-            className="w-full py-1.5 px-3 rounded-md bg-destructive text-destructive-foreground text-xs font-medium hover:bg-destructive/90 transition-colors shadow-sm flex items-center justify-center gap-1.5"
+            className="w-full py-1.5 px-3 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors shadow-2xs flex items-center justify-center gap-1.5"
           >
             <PhoneCall className="h-3 w-3" />
             <span>{t("sidebar.connectDesk")}</span>
           </button>
         </div>
-
-        <nav className="space-y-0.5">
-          {bottomNav.map((item) => (
-            <NavLink
-              key={item.key}
-              to={item.href}
-              onClick={onClose}
-              className={({ isActive }) =>
-                cn(
-                  "group flex items-center rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  isActive
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )
-              }
-            >
-              <item.icon className="mr-2.5 h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
-              <span>{t(`sidebar.${item.key}`)}</span>
-            </NavLink>
-          ))}
-        </nav>
       </div>
     </div>
   )

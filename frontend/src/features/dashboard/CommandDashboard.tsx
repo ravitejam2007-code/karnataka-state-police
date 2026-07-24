@@ -12,9 +12,12 @@ import { useNavigate } from "react-router-dom"
 
 import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 
+import { useAuthStore } from "@/store/useAuthStore"
+
 export function CommandDashboard() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { user } = useAuthStore()
 
   return (
     <div className="flex flex-col space-y-6 pb-8 font-sans">
@@ -39,14 +42,14 @@ export function CommandDashboard() {
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              State Crime Records Bureau • Intelligence & Operational Command
+              State Crime Records Bureau • Command Active for <strong className="text-foreground">{user?.name}</strong> ({user?.role || "Citizen"})
             </p>
           </div>
         </div>
 
         <button
-          onClick={() => navigate("/app/cases")}
-          className="self-start sm:self-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors shadow-2xs flex items-center gap-1.5 shrink-0"
+          onClick={() => navigate("/app/investigation")}
+          className="self-start sm:self-auto px-4 py-2 rounded-lg bg-[#2563EB] text-white font-semibold text-xs hover:bg-[#1D4ED8] transition-colors shadow-2xs flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
           <Plus className="h-4 w-4" />
           <span>{t("dashboard.createInvestigation")}</span>
@@ -55,16 +58,16 @@ export function CommandDashboard() {
 
       {/* AI Hub & Core Services Row */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-6 rounded-xl p-6 bg-slate-900 text-white border border-slate-800 shadow-2xs flex flex-col justify-between min-h-[200px]">
+        <div className="lg:col-span-6 rounded-xl p-6 bg-white text-[#1E293B] border border-[#E2E8F0] shadow-2xs flex flex-col justify-between min-h-[200px]">
           <div className="space-y-2.5 max-w-md">
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-400 bg-sky-950/60 border border-sky-800/60 px-2.5 py-1 rounded-full w-fit">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full w-fit">
               <Bot className="h-3.5 w-3.5" />
               <span>{t("dashboard.aiHub")}</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold leading-tight text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold leading-tight text-[#1E293B] tracking-tight">
               {t("dashboard.actionInsights")}
             </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-[#475569] leading-relaxed">
               {t("dashboard.aiDescription")}
             </p>
           </div>
@@ -72,10 +75,10 @@ export function CommandDashboard() {
           <div className="pt-4">
             <button
               onClick={() => navigate("/app/ai")}
-              className="px-4 py-2 rounded-lg bg-white text-slate-900 text-xs font-bold hover:bg-slate-100 transition-colors inline-flex items-center gap-2 shadow-2xs group"
+              className="px-4 py-2 rounded-lg bg-[#2563EB] text-white text-xs font-bold hover:bg-[#1D4ED8] transition-colors inline-flex items-center gap-2 shadow-2xs group cursor-pointer"
             >
               <span>{t("dashboard.startAnalysis")}</span>
-              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform text-slate-900" />
+              <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform text-white" />
             </button>
           </div>
         </div>

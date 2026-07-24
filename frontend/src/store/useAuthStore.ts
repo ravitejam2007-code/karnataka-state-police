@@ -2,68 +2,64 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 export type Role =
-  | "Investigator"
+  | "Administrator"
   | "Police Officer"
+  | "Investigator"
   | "Analyst"
   | "Supervisor"
-  | "Administrator"
   | "Policy Maker"
-
-export const ROLE_PASSWORDS: Record<Role, string> = {
-  "Investigator": "inv123",
-  "Police Officer": "off123",
-  "Analyst": "ana123",
-  "Supervisor": "sup123",
-  "Administrator": "admin123",
-  "Policy Maker": "policymaker123",
-}
+  | "Citizen"
 
 export interface User {
   id: string
   name: string
-  badgeId: string
   email: string
-  phone: string
+  role: Role
   department: string
-  permittedRoles: Role[]
+  badgeId: string
+  phone?: string
   avatar?: string
 }
 
 export interface RegisteredUser {
   id: string
   fullName: string
-  badgeId: string
   email: string
   password: string
-  mobile: string
+  role: Role
   department: string
-  permittedRoles: Role[]
+  badgeId: string
+  mobile?: string
   avatar?: string
 }
 
 export interface AuthResult {
   success: boolean
+  token?: string
+  user?: User
   errorKey?: string
   messageKey?: string
+  customMessage?: string
 }
 
 interface AuthState {
   isAuthenticated: boolean
-  isOtpVerified: boolean
+  token: string | null
   user: User | null
-  activeRole: Role | null
   registeredUsers: RegisteredUser[]
   login: (identifier: string, password: string) => Promise<AuthResult>
   registerUser: (newUser: {
     fullName: string
-    badgeId: string
     email: string
-    mobile: string
     password: string
+    role: Role
+    badgeId?: string
+    department?: string
+    mobile?: string
   }) => Promise<AuthResult>
   updateUserProfile: (updatedFields: Partial<User>) => void
   verifyOtp: (otp: string) => Promise<boolean>
-  selectRole: (role: Role) => void
+  updateUserRole: (userId: string, newRole: Role) => void
   logout: () => void
 }
 
@@ -71,22 +67,42 @@ const DEFAULT_USERS: RegisteredUser[] = [
   {
     id: "USR-2007",
     fullName: "Raviteja Manjunath",
-    badgeId: "KSP-2007",
     email: "ravitejam2007@gmail.com",
     password: "admin123",
-    mobile: "+91 91234 56789",
+    role: "Administrator",
     department: "State Crime Records Bureau",
-    permittedRoles: ["Administrator", "Supervisor", "Investigator", "Police Officer", "Analyst", "Policy Maker"],
+    badgeId: "KSP-2007",
+    mobile: "+91 91234 56789",
   },
   {
     id: "USR-9824",
     fullName: "Insp. R. Kumar",
-    badgeId: "KSP-9824",
     email: "r.kumar@ksp.gov.in",
     password: "password123",
-    mobile: "+91 98765 43210",
+    role: "Investigator",
     department: "Cyber Crime Division",
-    permittedRoles: ["Investigator", "Police Officer"],
+    badgeId: "KSP-9824",
+    mobile: "+91 98765 43210",
+  },
+  {
+    id: "USR-3341",
+    fullName: "Ananya Sharma",
+    email: "ananya.analyst@ksp.gov.in",
+    password: "password123",
+    role: "Analyst",
+    department: "Crime Analytics Cell",
+    badgeId: "KSP-3341",
+    mobile: "+91 97766 55443",
+  },
+  {
+    id: "USR-1042",
+    fullName: "Suresh Gowda",
+    email: "suresh.citizen@gmail.com",
+    password: "citizen123",
+    role: "Citizen",
+    department: "Public Citizen Services",
+    badgeId: "N/A",
+    mobile: "+91 99887 76655",
   },
 ]
 
@@ -94,79 +110,105 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       isAuthenticated: false,
-      isOtpVerified: false,
+      token: null,
       user: null,
-      activeRole: null,
       registeredUsers: DEFAULT_USERS,
 
       login: async (identifier, password) => {
-        await new Promise((resolve) => setTimeout(resolve, 600))
+        await new Promise((resolve) => setTimeout(resolve, 400))
         const cleanIdentifier = identifier.trim().toLowerCase()
         const currentUsers = get().registeredUsers && get().registeredUsers.length > 0
           ? get().registeredUsers
           : DEFAULT_USERS
 
-        // Find user by email or badgeId
         const foundUser = currentUsers.find(
           (u) =>
             u.email.toLowerCase() === cleanIdentifier ||
-            u.badgeId.toLowerCase() === cleanIdentifier
+            (u.badgeId !== "N/A" && u.badgeId.toLowerCase() === cleanIdentifier)
         )
 
         if (foundUser) {
           if (foundUser.password === password || password === "admin123") {
+            const userPayload: User = {
+              id: foundUser.id,
+              name: foundUser.fullName,
+              email: foundUser.email,
+              role: foundUser.role,
+              department: foundUser.department || "State Crime Records Bureau",
+              badgeId: foundUser.badgeId || "N/A",
+              phone: foundUser.mobile || "+91 98765 43210",
+              avatar: foundUser.avatar,
+            }
+
+            // Standard JWT token simulation from backend response
+            const tokenPayload = {
+              sub: foundUser.id,
+              name: foundUser.fullName,
+              email: foundUser.email,
+              role: foundUser.role,
+              department: userPayload.department,
+              badgeId: userPayload.badgeId,
+              iat: Math.floor(Date.now() / 1000),
+              exp: Math.floor(Date.now() / 1000) + 86400,
+            }
+            const jwtToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify(tokenPayload))}.signature`
+
             set({
               isAuthenticated: true,
-              isOtpVerified: true,
-              user: {
-                id: foundUser.id,
-                name: foundUser.fullName,
-                badgeId: foundUser.badgeId,
-                email: foundUser.email,
-                phone: foundUser.mobile || "+91 98765 43210",
-                department: foundUser.department || "State Crime Records Bureau",
-                permittedRoles: foundUser.permittedRoles,
-                avatar: foundUser.avatar,
-              },
-              activeRole: null,
+              token: jwtToken,
+              user: userPayload,
             })
-            return { success: true }
+
+            return { success: true, token: jwtToken, user: userPayload }
           }
           return { success: false, errorKey: "auth.invalidCredentials" }
         }
 
-        // Demo fallback for any badgeId or email if password is admin123
+        // Demo fallback for any email if password is admin123
         if (password === "admin123") {
           const isEmail = identifier.includes("@")
           const formattedName = isEmail
             ? identifier.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
             : identifier
-          const newUser: User = {
+
+          const userPayload: User = {
             id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
             name: formattedName,
-            badgeId: !isEmail ? identifier : `KSP-${Math.floor(1000 + Math.random() * 9000)}`,
             email: isEmail ? identifier : `${identifier.toLowerCase()}@ksp.gov.in`,
-            phone: "+91 98765 43210",
+            role: "Administrator",
             department: "State Crime Records Bureau",
-            permittedRoles: ["Administrator", "Supervisor", "Investigator", "Police Officer", "Analyst", "Policy Maker"],
+            badgeId: isEmail ? `KSP-${Math.floor(1000 + Math.random() * 9000)}` : identifier,
+            phone: "+91 98765 43210",
           }
+
+          const tokenPayload = {
+            sub: userPayload.id,
+            name: userPayload.name,
+            email: userPayload.email,
+            role: userPayload.role,
+            department: userPayload.department,
+            badgeId: userPayload.badgeId,
+            iat: Math.floor(Date.now() / 1000),
+            exp: Math.floor(Date.now() / 1000) + 86400,
+          }
+          const jwtToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify(tokenPayload))}.signature`
 
           set({
             isAuthenticated: true,
-            isOtpVerified: true,
-            user: newUser,
-            activeRole: null,
+            token: jwtToken,
+            user: userPayload,
           })
-          return { success: true }
+
+          return { success: true, token: jwtToken, user: userPayload }
         }
 
         return { success: false, errorKey: "auth.accountNotFound" }
       },
 
       registerUser: async (newUser) => {
-        await new Promise((resolve) => setTimeout(resolve, 600))
+        await new Promise((resolve) => setTimeout(resolve, 400))
         const cleanEmail = newUser.email.trim().toLowerCase()
-        const cleanBadgeId = newUser.badgeId.trim().toLowerCase()
+        const cleanBadgeId = newUser.badgeId ? newUser.badgeId.trim().toLowerCase() : ""
 
         const currentUsers = get().registeredUsers && get().registeredUsers.length > 0
           ? get().registeredUsers
@@ -175,29 +217,34 @@ export const useAuthStore = create<AuthState>()(
         const exists = currentUsers.some(
           (u) =>
             u.email.toLowerCase() === cleanEmail ||
-            u.badgeId.toLowerCase() === cleanBadgeId
+            (cleanBadgeId && u.badgeId !== "N/A" && u.badgeId.toLowerCase() === cleanBadgeId)
         )
 
         if (exists) {
           return { success: false, errorKey: "auth.userAlreadyExists" }
         }
 
+        const isCitizen = newUser.role === "Citizen"
         const createdUser: RegisteredUser = {
           id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
           fullName: newUser.fullName,
-          badgeId: newUser.badgeId,
           email: newUser.email,
           password: newUser.password,
+          role: newUser.role,
+          badgeId: isCitizen ? "N/A" : (newUser.badgeId || `KSP-${Math.floor(1000 + Math.random() * 9000)}`),
+          department: newUser.department || (isCitizen ? "Public Citizen Services" : "Karnataka State Police Headquarters"),
           mobile: newUser.mobile || "+91 98765 43210",
-          department: "State Crime Records Bureau",
-          permittedRoles: ["Investigator", "Police Officer", "Analyst", "Supervisor", "Administrator", "Policy Maker"],
         }
 
         set({
           registeredUsers: [...currentUsers, createdUser],
         })
 
-        return { success: true, messageKey: "auth.registerSuccess" }
+        return {
+          success: true,
+          messageKey: "auth.registerSuccess",
+          customMessage: `Account created successfully for ${newUser.fullName}! You can now log in.`
+        }
       },
 
       updateUserProfile: (updatedFields) => {
@@ -211,13 +258,14 @@ export const useAuthStore = create<AuthState>()(
 
         const currentRegistered = get().registeredUsers || []
         const updatedRegistered = currentRegistered.map((u) => {
-          if (u.id === currentUser.id || u.badgeId === currentUser.badgeId || u.email.toLowerCase() === currentUser.email.toLowerCase()) {
+          if (u.id === currentUser.id || u.email.toLowerCase() === currentUser.email.toLowerCase()) {
             return {
               ...u,
               fullName: updatedFields.name ?? u.fullName,
               email: updatedFields.email ?? u.email,
               mobile: updatedFields.phone ?? u.mobile,
               department: updatedFields.department ?? u.department,
+              role: updatedFields.role ?? u.role,
               avatar: updatedFields.avatar ?? u.avatar,
             }
           }
@@ -231,20 +279,26 @@ export const useAuthStore = create<AuthState>()(
       },
 
       verifyOtp: async (otp) => {
-        await new Promise((resolve) => setTimeout(resolve, 600))
-        if (otp === "123456") {
-          set({ isOtpVerified: true })
-          return true
-        }
-        return false
+        await new Promise((resolve) => setTimeout(resolve, 400))
+        return otp === "123456" || otp.length === 6
       },
 
-      selectRole: (role) => {
-        set({ activeRole: role })
+      updateUserRole: (userId, newRole) => {
+        const currentRegistered = get().registeredUsers || []
+        const updated = currentRegistered.map((u) =>
+          u.id === userId ? { ...u, role: newRole } : u
+        )
+
+        const currentUser = get().user
+        if (currentUser && currentUser.id === userId) {
+          set({ user: { ...currentUser, role: newRole } })
+        }
+
+        set({ registeredUsers: updated })
       },
 
       logout: () => {
-        set({ isAuthenticated: false, isOtpVerified: false, user: null, activeRole: null })
+        set({ isAuthenticated: false, token: null, user: null })
       },
     }),
     {
@@ -252,3 +306,5 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 )
+
+

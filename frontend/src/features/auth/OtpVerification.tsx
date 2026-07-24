@@ -46,7 +46,7 @@ export function OtpVerification() {
       } else {
         toast.error(t("auth.otpInvalid"))
       }
-    } catch (error) {
+    } catch {
       toast.error(t("auth.otpError"))
     } finally {
       setIsLoading(false)

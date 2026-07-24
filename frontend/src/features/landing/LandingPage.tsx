@@ -15,14 +15,14 @@ import {
   Fingerprint,
   AlertTriangle,
   Mail,
-  ChevronRight,
-  ChevronLeft,
   ArrowRight,
+  Briefcase,
+  Newspaper,
 } from "lucide-react"
+
 import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 
 const serviceKeys = [
   { icon: FileText, titleKey: "efir", descKey: "efirDesc" },
@@ -51,95 +51,104 @@ const helplineKeys = [
   { nameKey: "antiCorruption", number: "1064" },
 ]
 
-
-
 function Navbar() {
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-xs">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-3">
-            <img src={karnatakaEmblem} alt="Karnataka Emblem" className="h-12 w-auto" />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-bold tracking-widest text-primary/70 uppercase leading-none">
+    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-2xs font-sans">
+      <nav className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-[72px]">
+          
+          {/* Logo Section (Left) */}
+          <div className="flex items-center gap-3 shrink-0">
+            <img src={karnatakaEmblem} alt="Karnataka State Emblem" className="h-11 sm:h-12 w-auto object-contain" />
+            <div className="flex flex-col justify-center">
+              <span className="text-[10px] font-bold tracking-widest text-[#64748B] uppercase leading-tight">
                 {t("landing.navbar.governmentOfKarnataka")}
               </span>
-              <h1 className="text-lg font-bold text-primary leading-tight">{t("landing.navbar.ksp")}</h1>
-              <span className="text-[10px] text-primary/50 tracking-wide">{t("landing.navbar.scrb")}</span>
+              <h1 className="text-base sm:text-lg font-bold text-[#1E293B] leading-tight tracking-tight">
+                {t("landing.navbar.ksp")}
+              </h1>
+              <span className="text-[10px] font-medium text-[#64748B] leading-tight">
+                {t("landing.navbar.scrb")}
+              </span>
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-1">
+          {/* Navigation Menu (Center) */}
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {["home", "citizenServices", "news", "contact"].map(key => (
               <a
                 key={key}
                 href={`#${key === "home" ? "hero" : key === "citizenServices" ? "services" : key === "news" ? "news" : "contact"}`}
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                className="text-sm font-medium text-[#1E293B] hover:text-[#2563EB] transition-colors py-2"
               >
                 {t(`landing.navbar.${key}`)}
               </a>
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Right Section (Language & Direct Logins) */}
+          <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            <Link to="/auth/login">
-              <Button variant="outline" size="sm" className="border-primary/30 text-primary">
+            <Link to="/auth/login?portal=employee">
+              <Button variant="outline" size="sm" className="border-slate-300 text-[#1E293B] hover:bg-slate-50 font-medium text-xs sm:text-sm h-10 px-4 rounded-md cursor-pointer">
                 {t("landing.navbar.employeeLogin")}
               </Button>
             </Link>
-            <Link to="/auth/login">
-              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Link to="/auth/login?portal=citizen">
+              <Button size="sm" className="bg-[#111827] text-white hover:bg-slate-800 font-semibold text-xs sm:text-sm h-10 px-4 rounded-md shadow-2xs cursor-pointer">
                 <Shield className="h-4 w-4 mr-1.5" />
                 {t("landing.navbar.citizenLogin")}
               </Button>
             </Link>
           </div>
 
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 rounded-md hover:bg-gray-100"
+            className="md:hidden p-2 rounded-md hover:bg-slate-100 text-[#1E293B]"
+            aria-label="Toggle Menu"
           >
-            {mobileOpen ? <X className="h-6 w-6 text-primary" /> : <Menu className="h-6 w-6 text-primary" />}
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
-      </div>
+      </nav>
 
+      {/* Mobile Dropdown */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden border-t border-gray-200 bg-white overflow-hidden"
+            className="md:hidden border-t border-slate-200 bg-white overflow-hidden"
           >
-            <div className="container mx-auto px-4 py-4 space-y-3">
+            <div className="px-4 py-4 space-y-3">
               {["home", "citizenServices", "news", "contact"].map(key => (
                 <a
                   key={key}
                   href={`#${key === "home" ? "hero" : key === "citizenServices" ? "services" : key === "news" ? "news" : "contact"}`}
                   onClick={() => setMobileOpen(false)}
-                  className="block py-2 text-sm font-medium text-gray-700 hover:text-foreground"
+                  className="block py-2 text-sm font-semibold text-[#1E293B] hover:text-[#2563EB]"
                 >
                   {t(`landing.navbar.${key}`)}
                 </a>
               ))}
-              <div className="flex flex-col gap-2.5 pt-3 border-t border-gray-100">
+              <div className="flex flex-col gap-2.5 pt-3 border-t border-slate-100">
                 <div className="flex items-center justify-between py-1">
-                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Language</span>
+                  <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Language</span>
                   <LanguageSwitcher />
                 </div>
                 <div className="flex gap-2">
-                  <Link to="/auth/login" className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full border-primary/30 text-primary">
+                  <Link to="/auth/login?portal=employee" className="flex-1" onClick={() => setMobileOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full border-slate-300 text-[#1E293B]">
                       {t("landing.navbar.employeeLogin")}
                     </Button>
                   </Link>
-                  <Link to="/auth/login" className="flex-1">
-                    <Button size="sm" className="w-full bg-primary text-primary-foreground">
+                  <Link to="/auth/login?portal=citizen" className="flex-1" onClick={() => setMobileOpen(false)}>
+                    <Button size="sm" className="w-full bg-[#111827] text-white">
                       {t("landing.navbar.citizenLogin")}
                     </Button>
                   </Link>
@@ -149,7 +158,7 @@ function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   )
 }
 
@@ -157,64 +166,57 @@ function HeroSection() {
   const { t } = useTranslation()
 
   return (
-    <section id="hero" className="relative min-h-[85vh] flex items-center overflow-hidden bg-primary">
-      <div className="container mx-auto px-4 relative z-10 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-primary-foreground/10 border border-primary-foreground/20 px-4 py-1.5 mb-6 rounded-sm">
-              <Shield className="h-4 w-4 text-primary-foreground" />
-              <span className="text-xs font-medium text-white/90">{t("landing.hero.badge")}</span>
-            </div>
-
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-              {t("landing.hero.title")}
-            </h1>
-            <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-4 max-w-xl">
-              {t("landing.hero.subtitle")}
-            </p>
-            <p className="text-sm text-white/60 mb-8 max-w-lg">
-              {t("landing.hero.description")}
-            </p>
-
-            <div className="flex flex-wrap gap-3">
-              <Link to="/auth/login">
-                <Button size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-bold px-8 shadow-sm">
-                  {t("landing.hero.ctaCitizenServices")}
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <a href="#services">
-                <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/30 text-white hover:bg-white/10 hover:text-white transition-colors px-8">
-                  {t("landing.hero.ctaExplore")}
-                </Button>
-              </a>
-            </div>
-
-            <div className="flex items-center gap-6 mt-10 pt-8 border-t border-white/10">
-              {helplineKeys.slice(0, 3).map(h => (
-                <a key={h.number} href={`tel:${h.number}`} className="flex items-center gap-2 group">
-                  <div className="p-1.5 rounded-full bg-white/10">
-                    <PhoneCall className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-white/50 uppercase tracking-wider">{t(`landing.helplines.${h.nameKey}`)}</div>
-                    <div className="text-sm font-bold text-white">{h.number}</div>
-                  </div>
-                </a>
-              ))}
-            </div>
+    <section id="hero" className="relative bg-[#F8FAFC] border-b border-[#E2E8F0] pt-[48px] pb-[48px] md:pt-[56px] md:pb-[56px] lg:pt-[72px] lg:pb-[64px] font-sans">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+          
+          {/* Government Badge */}
+          <div className="inline-flex items-center gap-2 bg-white border border-[#E2E8F0] px-3.5 py-1.5 rounded-full shadow-2xs mb-6">
+            <img src={karnatakaEmblem} alt="Government of Karnataka Emblem" className="h-4 w-auto object-contain" />
+            <span className="text-xs font-semibold tracking-wide text-[#1E293B]">
+              {t("landing.navbar.governmentOfKarnataka")} • {t("landing.navbar.scrb")}
+            </span>
           </div>
 
-          <div className="hidden lg:flex justify-center">
-            <div className="bg-white/5 border border-white/10 rounded-sm p-8 max-w-sm">
-              <img src={karnatakaEmblem} alt="Karnataka State Police Emblem" className="w-48 h-48 mx-auto object-contain opacity-90" />
-              <div className="text-center mt-4 space-y-1">
-                <div className="text-lg font-bold text-white">{t("landing.hero.emblemKSP")}</div>
-                <div className="text-xs text-white/60">{t("landing.hero.emblemGovt")}</div>
-                <div className="text-xs font-semibold text-white/80">Suraksha Eva Seva</div>
-              </div>
-            </div>
+          {/* Hero Title */}
+          <h1 className="text-[34px] md:text-[42px] lg:text-[54px] font-bold text-[#1E293B] tracking-tight leading-[1.15] max-w-3xl mb-6">
+            {t("landing.hero.title")}
+          </h1>
+
+          {/* Hero Description */}
+          <p className="text-[16px] md:text-[18px] text-[#475569] leading-[1.7] max-w-2xl mb-8">
+            {t("landing.hero.subtitle")}
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-8">
+            <Link to="/auth/login" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto bg-[#1E3A8A] text-white hover:bg-[#1D4ED8] font-bold px-7 h-[48px] rounded-[12px] shadow-sm hover:-translate-y-[2px] transition-all duration-200 text-sm"
+              >
+                {t("landing.hero.ctaCitizenServices")}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <a href="#services" className="w-full sm:w-auto">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full sm:w-auto bg-white border border-[#1E3A8A] text-[#1E293B] hover:bg-slate-50 font-semibold px-7 h-[48px] rounded-[12px] shadow-sm hover:-translate-y-[2px] transition-all duration-200 text-sm"
+              >
+                {t("landing.hero.ctaExplore")}
+              </Button>
+            </a>
           </div>
+
+          {/* Government Subtitle / Feature Line */}
+          <div className="w-full max-w-xl border-t border-[#E2E8F0] pt-5 mt-2">
+            <p className="text-xs md:text-sm font-medium text-[#475569] tracking-wide text-center">
+              Supporting Investigation • Crime Analytics • Predictive Intelligence • Secure Operations
+            </p>
+          </div>
+
         </div>
       </div>
     </section>
@@ -225,36 +227,44 @@ function ServicesSection() {
   const { t } = useTranslation()
 
   return (
-    <section id="services" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-muted border border-border rounded-full px-4 py-1.5 mb-4">
-            <BadgeCheck className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("landing.services.badge")}</span>
+    <section id="services" className="py-14 md:py-18 bg-white font-sans border-b border-slate-200">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-300 rounded-full px-3.5 py-1 mb-3">
+            <Briefcase className="h-3.5 w-3.5 text-slate-700" />
+            <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{t("landing.services.badge")}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">
             {t("landing.services.title")}
           </h2>
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-slate-600 text-sm leading-relaxed">
             {t("landing.services.subtitle")}
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {serviceKeys.map((service) => {
-            const Icon = service.icon
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {serviceKeys.map((s) => {
+            const Icon = s.icon
             return (
-              <Card key={service.titleKey} className="h-full p-6 border border-gray-200 hover:shadow-sm transition-all bg-white">
-                <div className="p-3 rounded-sm bg-muted w-fit mb-4">
-                  <Icon className="h-6 w-6 text-muted-foreground" />
+              <div
+                key={s.titleKey}
+                className="group p-5 rounded-xl bg-white border border-slate-200 hover:border-slate-400 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="p-2.5 rounded-lg bg-slate-100 text-slate-800 w-fit mb-3.5 group-hover:bg-[#111827] group-hover:text-white transition-colors">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-900 mb-1.5 group-hover:text-blue-600 transition-colors">
+                    {t(`landing.services.${s.titleKey}`)}
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed mb-4">
+                    {t(`landing.services.${s.descKey}`)}
+                  </p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2 text-sm">{t(`landing.services.${service.titleKey}`)}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{t(`landing.services.${service.descKey}`)}</p>
-                <div className="mt-4 flex items-center gap-1 text-xs font-medium text-primary">
-                  <span>{t("landing.services.learnMore")}</span>
-                  <ChevronRight className="h-3 w-3" />
-                </div>
-              </Card>
+                <Link to="/auth/login" className="inline-flex items-center text-xs font-semibold text-blue-600 hover:underline pt-2 border-t border-slate-100">
+                  Access Portal Module <ArrowRight className="ml-1 h-3 w-3" />
+                </Link>
+              </div>
             )
           })}
         </div>
@@ -265,63 +275,44 @@ function ServicesSection() {
 
 function NewsSection() {
   const { t } = useTranslation()
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  const next = () => setCurrentIndex(prev => Math.min(prev + 1, newsKeys.length - 1))
-  const prev = () => setCurrentIndex(prev => Math.max(prev - 1, 0))
 
   return (
-    <section id="news" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 bg-muted border border-border rounded-full px-4 py-1.5 mb-4">
-            <FileText className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("landing.news.badge")}</span>
+    <section id="news" className="py-14 md:py-18 bg-[#F8FAFC] border-b border-slate-200 font-sans">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-4 border-b border-slate-200">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-slate-200/80 border border-slate-300 rounded-full px-3 py-1 mb-2">
+              <Newspaper className="h-3.5 w-3.5 text-slate-700" />
+              <span className="text-[11px] font-semibold text-slate-700 uppercase tracking-wider">{t("landing.news.badge")}</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">{t("landing.news.title")}</h2>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            {t("landing.news.title")}
-          </h2>
-          <p className="text-gray-600 leading-relaxed">
-            {t("landing.news.subtitle")}
-          </p>
+          <a href="#" className="mt-3 md:mt-0 text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            {t("landing.news.viewAll")} <ArrowRight className="h-3.5 w-3.5" />
+          </a>
         </div>
 
-        <div className="relative max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6">
-            {newsKeys.slice(currentIndex, currentIndex + 2).map((item) => (
-              <Card key={item.titleKey} className="p-6 border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all bg-white h-full">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xs font-semibold text-primary/60 bg-primary/5 px-2.5 py-1 rounded-full">{item.date}</span>
-                  <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{t(`landing.news.${item.tagKey}`)}</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {newsKeys.map((item, i) => (
+            <div key={i} className="bg-white border border-slate-200 rounded-xl p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 mb-2.5">
+                  <span className="font-mono">{item.date}</span>
+                  <span>•</span>
+                  <span className="text-blue-700 font-medium">{t(`landing.news.${item.tagKey}`)}</span>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{t(`landing.news.${item.titleKey}`)}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{t(`landing.news.${item.descKey}`)}</p>
-                <a href="#" className="inline-flex items-center gap-1 text-sm font-medium text-primary mt-4 hover:gap-2 transition-all">
-                  {t("landing.news.readMore")} <ChevronRight className="h-3.5 w-3.5" />
-                </a>
-              </Card>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-center gap-3 mt-8">
-            <button
-              onClick={prev}
-              disabled={currentIndex === 0}
-              className="p-2 rounded-full border border-gray-300 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <span className="text-sm text-gray-500">
-              {currentIndex + 1}–{Math.min(currentIndex + 2, newsKeys.length)} of {newsKeys.length}
-            </span>
-            <button
-              onClick={next}
-              disabled={currentIndex >= newsKeys.length - 2}
-              className="p-2 rounded-full border border-gray-300 hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
+                <h4 className="font-bold text-sm text-slate-900 mb-2 line-clamp-2 leading-snug">
+                  {t(`landing.news.${item.titleKey}`)}
+                </h4>
+                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed mb-4">
+                  {t(`landing.news.${item.descKey}`)}
+                </p>
+              </div>
+              <a href="#" className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1 pt-2 border-t border-slate-100">
+                Official Bulletin <ArrowRight className="h-3 w-3" />
+              </a>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -332,41 +323,41 @@ function HelplineSection() {
   const { t } = useTranslation()
 
   return (
-    <section id="contact" className="py-16 sm:py-20 bg-slate-50 border-t border-b border-slate-200/80 relative overflow-hidden">
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 bg-slate-200/70 border border-slate-300 rounded-full px-3.5 py-1 mb-4">
-            <PhoneCall className="h-3.5 w-3.5 text-primary" />
+    <section id="contact" className="py-14 sm:py-18 bg-white font-sans">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-300 rounded-full px-3.5 py-1 mb-3">
+            <PhoneCall className="h-3.5 w-3.5 text-slate-700" />
             <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">{t("landing.helplines.badge")}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight mb-2">
             {t("landing.helplines.title")}
           </h2>
-          <p className="text-slate-600 leading-relaxed text-sm md:text-base max-w-2xl mx-auto">
+          <p className="text-slate-600 text-sm leading-relaxed">
             {t("landing.helplines.subtitle")}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
           {helplineKeys.map((h) => (
             <a
               key={h.number}
               href={`tel:${h.number}`}
-              className="group flex flex-col justify-center text-center p-5 rounded-lg bg-white border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all h-full"
+              className="group flex flex-col justify-center text-center p-4 rounded-xl bg-slate-50 border border-slate-200 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all h-full"
             >
-              <div className="p-3 rounded-full bg-slate-100 group-hover:bg-primary/10 transition-colors w-fit mx-auto mb-3">
-                <PhoneCall className="h-5 w-5 text-primary" />
+              <div className="p-2.5 rounded-full bg-white border border-slate-200 group-hover:bg-blue-50 group-hover:border-blue-200 transition-colors w-fit mx-auto mb-2.5">
+                <PhoneCall className="h-4 w-4 text-slate-700 group-hover:text-blue-600" />
               </div>
-              <div className="text-xl font-bold text-slate-900 mb-1 group-hover:text-primary transition-colors">{h.number}</div>
-              <div className="text-xs text-slate-600 font-medium leading-snug">{t(`landing.helplines.${h.nameKey}`)}</div>
+              <div className="text-lg font-bold text-slate-900 mb-0.5 group-hover:text-blue-600 transition-colors font-mono">{h.number}</div>
+              <div className="text-[11px] text-slate-600 font-medium leading-snug">{t(`landing.helplines.${h.nameKey}`)}</div>
             </a>
           ))}
         </div>
 
-        <div className="mt-10 text-center">
-          <p className="text-xs sm:text-sm text-slate-600">
+        <div className="mt-8 text-center pt-6 border-t border-slate-100">
+          <p className="text-xs text-slate-600">
             {t("landing.helplines.generalInquiry")}{" "}
-            <a href="mailto:info@ksp.karnataka.gov.in" className="text-primary hover:underline font-semibold">
+            <a href="mailto:info@ksp.karnataka.gov.in" className="text-blue-600 hover:underline font-semibold">
               info@ksp.karnataka.gov.in
             </a>{" "}
             {t("landing.helplines.orVisit")}
@@ -378,114 +369,85 @@ function HelplineSection() {
 }
 
 function Footer() {
-  const { t } = useTranslation()
-
   return (
-    <footer className="bg-primary text-primary-foreground border-t border-white/10">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
-          <div className="space-y-4">
+    <footer className="bg-[#F8FAFC] text-[#1E293B] border-t border-[#E2E8F0] font-sans">
+      <div className="container mx-auto px-4 max-w-6xl py-8 md:py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-[#E2E8F0]">
+          
+          {/* Left Column: Official Identity */}
+          <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <img src={karnatakaEmblem} alt="Karnataka Emblem" className="h-12 w-auto opacity-90" />
+              <img src={karnatakaEmblem} alt="Government of Karnataka Emblem" className="h-10 w-auto object-contain" />
               <div>
-                <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase block leading-none">{t("landing.footer.governmentOfKarnataka")}</span>
-                <h4 className="font-bold text-base text-white leading-tight">{t("landing.footer.ksp")}</h4>
-                <p className="text-[10px] text-white/50">{t("landing.footer.scrb")}</p>
+                <span className="text-[9px] font-extrabold tracking-widest text-[#64748B] uppercase block leading-none">Government of Karnataka</span>
+                <h4 className="font-bold text-sm text-[#1E293B] leading-tight">Karnataka State Police</h4>
+                <p className="text-[10px] text-[#64748B]">State Crime Records Bureau</p>
               </div>
             </div>
-            <p className="text-xs text-white/60 leading-relaxed">
-              {t("landing.footer.description")}
+            <p className="text-xs text-[#475569] leading-relaxed max-w-sm">
+              Official AI-powered crime intelligence platform supporting Karnataka State Police with real-time analytics, investigation tools, and secure operations.
             </p>
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-sm bg-white/5 border border-white/10">
-                <img src={karnatakaEmblem} alt="Emblem" className="h-6 w-auto" />
-              </div>
-              <div className="text-[10px] text-white/40">
-                <div>{t("landing.footer.gigw")}</div>
-                <div>{t("landing.footer.stqc")}</div>
-              </div>
-            </div>
           </div>
 
-          <div className="space-y-4">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-white/80">{t("landing.footer.quickLinks")}</h5>
-            <ul className="space-y-2.5 text-xs text-white/60">
-              {["home", "citizenCharter", "rightToInfo", "recruitment", "tenders", "contactUs"].map(item => (
-                <li key={item}>
-                  <a href="#" className="hover:text-white/80 transition-colors flex items-center gap-1.5 group">
-                    <span className="h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-                    {t(`landing.footer.${item}`)}
-                  </a>
-                </li>
-              ))}
+          {/* Center Column: Quick Navigation */}
+          <div className="space-y-2.5">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-[#1E293B]">Portal Navigation</h5>
+            <ul className="grid grid-cols-2 gap-2 text-xs text-[#475569]">
+              <li>
+                <a href="#hero" className="hover:text-[#1E3A8A] transition-colors">Home</a>
+              </li>
+              <li>
+                <a href="#services" className="hover:text-[#1E3A8A] transition-colors">Citizen Services</a>
+              </li>
+              <li>
+                <a href="#news" className="hover:text-[#1E3A8A] transition-colors">Press Bulletins</a>
+              </li>
+              <li>
+                <a href="#contact" className="hover:text-[#1E3A8A] transition-colors">Emergency Helplines</a>
+              </li>
+              <li>
+                <Link to="/auth/login" className="hover:text-[#1E3A8A] transition-colors">Employee Login</Link>
+              </li>
+              <li>
+                <Link to="/auth/login" className="hover:text-[#1E3A8A] transition-colors">Citizen Gateway</Link>
+              </li>
             </ul>
           </div>
 
-          <div className="space-y-4">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-white/80">{t("landing.footer.citizenServices")}</h5>
-            <ul className="space-y-2.5 text-xs text-white/60">
-              {["efir", "missingPerson", "characterVerification", "trafficChallan", "cyberCrimeReport", "lostFound", "policeVerification"].map(item => (
-                <li key={item}>
-                  <a href="#" className="hover:text-white/80 transition-colors flex items-center gap-1.5 group">
-                    <span className="h-1 w-1 rounded-full bg-white/20 group-hover:bg-white/40 transition-colors" />
-                    {t(`landing.footer.${item}`)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-4">
-            <h5 className="text-xs font-bold uppercase tracking-wider text-white/80">{t("landing.footer.contactInfo")}</h5>
-            <ul className="space-y-3 text-xs text-white/60">
-              <li className="flex gap-2">
-                <MapPin className="h-3.5 w-3.5 text-white/80 shrink-0 mt-0.5" />
-                <span>{t("landing.footer.address")}</span>
+          {/* Right Column: Contact Headquarters */}
+          <div className="space-y-2.5">
+            <h5 className="text-xs font-bold uppercase tracking-wider text-[#1E293B]">State Headquarters</h5>
+            <ul className="space-y-2 text-xs text-[#475569]">
+              <li className="flex items-start gap-2">
+                <MapPin className="h-3.5 w-3.5 text-[#1E3A8A] shrink-0 mt-0.5" />
+                <span>State Crime Records Bureau, Nrupatunga Road, Bengaluru, Karnataka 560001</span>
               </li>
-              <li>
-                <a href="tel:112" className="flex items-center gap-2 hover:text-white/80 transition-colors">
-                  <PhoneCall className="h-3.5 w-3.5 text-white/80 shrink-0" />
-                  <span>{t("landing.footer.emergency")}</span>
-                </a>
+              <li className="flex items-center gap-2">
+                <PhoneCall className="h-3.5 w-3.5 text-[#1E3A8A] shrink-0" />
+                <span>Emergency Command Center: <strong className="text-[#1E293B] font-mono">112</strong></span>
               </li>
-              <li>
-                <a href="mailto:info@ksp.karnataka.gov.in" className="flex items-center gap-2 hover:text-white/80 transition-colors">
-                  <Mail className="h-3.5 w-3.5 text-white/80 shrink-0" />
-                  <span>{t("landing.footer.email")}</span>
+              <li className="flex items-center gap-2">
+                <Mail className="h-3.5 w-3.5 text-[#1E3A8A] shrink-0" />
+                <a href="mailto:info@ksp.karnataka.gov.in" className="hover:underline hover:text-[#1E3A8A]">
+                  info@ksp.karnataka.gov.in
                 </a>
               </li>
             </ul>
-            <div className="pt-2">
-              <div className="text-[11px] font-semibold text-white/70 mb-2">{t("landing.footer.followUs")}</div>
-              <div className="flex gap-2">
-                {["Facebook", "Twitter", "YouTube", "Instagram"].map(sm => (
-                  <a
-                    key={sm}
-                    href="#"
-                    className="px-2.5 py-1 rounded-sm bg-white/5 border border-white/10 text-[10px] text-white/50 hover:bg-white/10 hover:text-white transition-all"
-                  >
-                    {sm}
-                  </a>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-white/40">
-          <div className="flex items-center gap-2 text-center md:text-left">
-            <Shield className="h-3.5 w-3.5" />
-            <span>{t("landing.footer.copyright")}</span>
+        {/* Bottom Copyright & Legal Links */}
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-[#64748B]">
+          <div>
+            © 2026 Karnataka State Police • Government of Karnataka. All Rights Reserved.
           </div>
-          <div className="flex items-center gap-4">
-            {["privacyPolicy", "termsOfUse", "accessibility", "sitemap"].map(item => (
-              <a key={item} href="#" className="hover:text-white/80 transition-colors">{t(`landing.footer.${item}`)}</a>
-            ))}
+          <div className="flex items-center gap-4 text-xs">
+            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Privacy Policy</a>
+            <span>•</span>
+            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Terms of Use</a>
+            <span>•</span>
+            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Accessibility Statement</a>
           </div>
-        </div>
-
-        <div className="mt-4 pt-4 border-t border-white/5 text-[9px] text-white/30 text-center">
-          {t("landing.footer.designedBy")} {t("landing.footer.lastUpdated")}
         </div>
       </div>
     </footer>

@@ -28,12 +28,12 @@ export function AIThinkingIndicator() {
   const StepIcon = thinkingSteps[currentStep].icon;
 
   return (
-    <div className="w-full max-w-2xl mx-auto my-8 flex items-center justify-center p-6 border border-blue-900/30 bg-blue-950/20 rounded-lg shadow-inner">
-      <div className="flex flex-col items-center gap-4">
+    <div className="w-full max-w-xl mx-auto my-6 flex items-center justify-center p-5 border border-[#E2E8F0] bg-white rounded-xl shadow-2xs">
+      <div className="flex flex-col items-center gap-3">
         
-        <div className="relative flex items-center justify-center h-12 w-12">
-          <span className="absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-20 animate-ping"></span>
-          <div className="relative h-10 w-10 bg-blue-900 rounded-full border border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+        <div className="relative flex items-center justify-center h-10 w-10">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-[#2563EB]/20 animate-ping"></span>
+          <div className="relative h-9 w-9 bg-[#2563EB]/10 rounded-full border border-[#2563EB]/30 flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
@@ -42,7 +42,7 @@ export function AIThinkingIndicator() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.2 }}
               >
-                <StepIcon className="h-5 w-5 text-blue-300" />
+                <StepIcon className="h-4 w-4 text-[#2563EB]" />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -56,16 +56,16 @@ export function AIThinkingIndicator() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="text-sm font-medium tracking-wide text-blue-300 font-mono"
+              className="text-xs font-semibold tracking-wide text-[#2563EB] font-sans"
             >
               {thinkingSteps[currentStep].text}
             </motion.div>
           </AnimatePresence>
         </div>
         
-        <div className="w-48 h-1 bg-slate-800 rounded-full overflow-hidden mt-2">
+        <div className="w-40 h-1 bg-[#E2E8F0] rounded-full overflow-hidden mt-1">
           <motion.div 
-            className="h-full bg-blue-500"
+            className="h-full bg-[#2563EB]"
             initial={{ width: "0%" }}
             animate={{ width: `${((currentStep + 1) / thinkingSteps.length) * 100}%` }}
             transition={{ duration: 0.5 }}

@@ -33,7 +33,7 @@ export function CriminalNetworkPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950 text-slate-200 overflow-hidden">
+    <div className="flex flex-col h-full bg-[#F8FAFC] text-[#1E293B] overflow-hidden font-sans">
       <NetworkInvestigationHeader 
         totalEntities={activeTemplate.data.nodes.length}
         totalRelationships={activeTemplate.data.edges.length}
@@ -46,13 +46,13 @@ export function CriminalNetworkPage() {
           onSelectTemplate={handleSelectTemplate}
         />
         
-        <div className="flex-1 relative flex overflow-hidden bg-slate-950">
+        <div className="flex-1 relative flex overflow-hidden bg-white">
           
           {/* Top KPI Layer */}
           <KPICards />
           
           {/* Main Canvas */}
-          <div className="flex-1 bg-slate-950/50 backdrop-blur-sm relative overflow-hidden">
+          <div className="flex-1 bg-[#F8FAFC] relative overflow-hidden">
           <AnimatePresence mode="wait">
             {isLoading ? (
               <motion.div 
@@ -60,7 +60,7 @@ export function CriminalNetworkPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center bg-slate-950 z-10"
+                className="absolute inset-0 flex items-center justify-center bg-white z-10"
               >
                 <ContextualLoader icon={Network} message="Building Criminal Network & Finding Relationships..." />
               </motion.div>
