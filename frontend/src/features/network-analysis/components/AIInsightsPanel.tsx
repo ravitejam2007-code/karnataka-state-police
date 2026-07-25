@@ -1,44 +1,23 @@
 import { useState } from "react";
-import { Brain, Shield, ChevronDown, Check, Activity, Target, ShieldAlert, GitBranch, Sparkles } from "lucide-react";
+import { Brain, Shield, ChevronDown, Check, Activity, Target, ShieldAlert, GitBranch, Sparkles, X } from "lucide-react";
+import { CASES_OPTIONS, getCaseDetail } from "../data/mockNetworkData";
 
 interface Props {
   activeCaseId: string;
   onSelectCase: (caseId: string) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-const CASES_OPTIONS = [
-  {
-    id: "FIR-2026-0412",
-    title: "FIR/2026/0412 - Mysuru Bank Robbery Syndicate",
-    district: "Mysuru Urban",
-    nodes: 8,
-    edges: 12,
-    risk: "High Priority"
-  },
-  {
-    id: "FIR-2026-1098",
-    title: "FIR/2026/1098 - Cyber Crypto Phishing Network",
-    district: "Bengaluru East",
-    nodes: 14,
-    edges: 22,
-    risk: "Critical"
-  },
-  {
-    id: "FIR-2025-0891",
-    title: "FIR/2025/0891 - Interstate Vehicle Theft Ring",
-    district: "Chamarajanagar",
-    nodes: 6,
-    edges: 9,
-    risk: "Medium"
-  }
-];
-
-export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
+export function AIInsightsPanel({ activeCaseId, onSelectCase, isOpen: isMobileDrawerOpen = false, onClose }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const caseDetail = getCaseDetail(activeCaseId);
   const activeCase = CASES_OPTIONS.find(c => c.id === activeCaseId) || CASES_OPTIONS[0];
 
   return (
-    <div className="hidden lg:flex w-80 bg-white border-r border-[#E2E8F0] flex-col h-full overflow-hidden text-[#1E293B] shrink-0 font-sans">
+    <div className={`fixed lg:static inset-y-0 left-0 z-40 w-80 bg-white border-r border-[#E2E8F0] flex flex-col h-full overflow-hidden text-[#1E293B] shrink-0 font-sans transition-transform duration-300 shadow-2xl lg:shadow-none ${
+      isMobileDrawerOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+    }`}>
       
       {/* Case Intelligence Selector Top Section */}
       <div className="p-3.5 border-b border-[#E2E8F0] bg-[#F8FAFC] space-y-2.5">
@@ -47,9 +26,20 @@ export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
             <Shield className="h-3.5 w-3.5 text-[#0F172A]" />
             Case Intelligence Selector
           </span>
-          <span className="text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-mono font-bold text-[9px]">
-            LIVE GRAPH
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-mono font-bold text-[9px]">
+              LIVE GRAPH
+            </span>
+            {onClose && (
+              <button 
+                onClick={onClose}
+                className="lg:hidden p-1 text-[#64748B] hover:text-[#1F2937] min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
+                aria-label="Close Insights Drawer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Dropdown Selector Button */}
@@ -120,7 +110,7 @@ export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
               Risk Assessment
             </div>
             <p className="text-xs text-[#475569] leading-relaxed bg-[#F8FAFC] p-2.5 rounded-lg border border-[#E2E8F0]">
-              High density of financial transactions between unverified accounts and known associates of Syed Ali. Indicates structured money laundering operation.
+              {caseDetail.insights.riskAssessment}
             </p>
           </div>
 
@@ -131,11 +121,11 @@ export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
             </div>
             <div className="flex items-center gap-3 bg-red-50 p-2.5 rounded-lg border border-red-200">
               <div className="h-8 w-8 bg-red-600 rounded-full flex items-center justify-center font-bold text-white text-xs shrink-0">
-                SA
+                {caseDetail.insights.potentialLeader.initials}
               </div>
               <div>
-                <div className="text-xs font-bold text-[#1E293B]">Syed Ali (Raju)</div>
-                <div className="text-[10px] text-[#64748B]">Highest centrality index (0.85)</div>
+                <div className="text-xs font-bold text-[#1E293B]">{caseDetail.insights.potentialLeader.name}</div>
+                <div className="text-[10px] text-[#64748B]">Highest centrality index ({caseDetail.insights.potentialLeader.centrality})</div>
               </div>
             </div>
           </div>
@@ -146,14 +136,12 @@ export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
               Hidden Relationships
             </div>
             <ul className="text-xs text-[#475569] space-y-2 bg-[#F8FAFC] p-2.5 rounded-lg border border-[#E2E8F0]">
-              <li className="flex gap-2">
-                <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-emerald-600 shrink-0" />
-                <span>Vehicle KA-09-ER-4567 is registered to address matching Bank Account 0451XXXX2398.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-emerald-600 shrink-0" />
-                <span>Phone 9845X XXXXX pinged near Victim's location during incident window.</span>
-              </li>
+              {caseDetail.insights.hiddenRelationships.map((item, idx) => (
+                <li key={idx} className="flex gap-2">
+                  <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-emerald-600 shrink-0" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -163,12 +151,14 @@ export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
               Suggested Leads
             </div>
             <div className="space-y-1.5">
-              <button className="w-full text-left text-xs font-semibold px-2.5 py-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#0F172A] hover:text-white transition-colors text-[#1E293B] cursor-pointer">
-                Subpoena Bank Account Logs
-              </button>
-              <button className="w-full text-left text-xs font-semibold px-2.5 py-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#0F172A] hover:text-white transition-colors text-[#1E293B] cursor-pointer">
-                Locate Vehicle KA-09-ER-4567
-              </button>
+              {caseDetail.insights.suggestedLeads.map((lead, idx) => (
+                <button 
+                  key={idx}
+                  className="w-full text-left text-xs font-semibold px-2.5 py-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#0F172A] hover:text-white transition-colors text-[#1E293B] cursor-pointer"
+                >
+                  {lead}
+                </button>
+              ))}
             </div>
           </div>
         </div>

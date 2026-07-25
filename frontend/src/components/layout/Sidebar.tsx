@@ -13,10 +13,12 @@ import {
   Briefcase,
   ChevronDown,
   ChevronUp,
+  X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "react-i18next"
 import { useAuthStore } from "@/store/useAuthStore"
+import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 
 interface NavItem {
   key: string
@@ -59,16 +61,16 @@ function CollapsibleSection({
   const { t } = useTranslation()
 
   return (
-    <div>
+    <div className="space-y-1">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full px-3 py-1.5 text-[10px] font-bold text-muted-foreground tracking-wider uppercase hover:text-foreground transition-colors"
+        className="flex items-center justify-between w-full px-3 py-2 text-[10px] font-bold text-muted-foreground tracking-wider uppercase hover:text-foreground transition-colors min-h-[36px] cursor-pointer"
       >
         <span>{title}</span>
-        {open ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+        {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
       </button>
       {open && (
-        <nav className="space-y-0.5 mt-0.5">
+        <nav className="space-y-1">
           {items.map((item) => (
             <NavLink
               key={item.key}
@@ -76,9 +78,9 @@ function CollapsibleSection({
               onClick={onItemClick}
               className={({ isActive }) =>
                 cn(
-                  "group flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-all",
+                  "group flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-medium transition-all min-h-[44px]",
                   isActive
-                    ? "bg-[#F3F4F6] text-[#111827] font-bold border border-[#E5E7EB]"
+                    ? "bg-[#F3F4F6] text-[#111827] font-bold border border-[#E5E7EB] shadow-2xs"
                     : "text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
                 )
               }
@@ -94,6 +96,11 @@ function CollapsibleSection({
                     />
                     <span>{t(`sidebar.${item.key}`)}</span>
                   </div>
+                  {item.badge && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#111827] text-white">
+                      {item.badge}
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>
@@ -109,25 +116,31 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
   const { user } = useAuthStore()
   const currentRole = user?.role || "Citizen"
 
-  // Role-based navigation filtering helper
+  // Role-based navigation filtering helper matching RBAC requirements
   const isItemAllowed = (href: string) => {
     if (currentRole === "Administrator") return true
-    if (href === "/app/dashboard" || href === "/app/cases" || href === "/app/investigation") return true
+    if (href === "/app/dashboard") return true
 
+    if (href === "/app/cases") {
+      return ["Police Officer", "Investigator", "Supervisor", "Senior Officers", "Sub-Ordinates"].includes(currentRole)
+    }
+    if (href === "/app/investigation") {
+      return ["Police Officer", "Investigator", "Supervisor", "Senior Officers"].includes(currentRole)
+    }
     if (href === "/app/map") {
-      return ["Police Officer", "Investigator", "Supervisor"].includes(currentRole)
+      return ["Police Officer", "Investigator", "Analyst", "Supervisor", "Senior Officers"].includes(currentRole)
     }
     if (href === "/app/ai") {
-      return ["Police Officer", "Investigator", "Analyst", "Supervisor"].includes(currentRole)
+      return ["Police Officer", "Investigator", "Analyst", "Supervisor", "Senior Officers", "Sub-Ordinates"].includes(currentRole)
     }
     if (href === "/app/analytics" || href === "/app/forecast" || href === "/app/reports") {
-      return ["Analyst", "Investigator", "Supervisor", "Policy Maker"].includes(currentRole)
+      return ["Analyst", "Investigator", "Supervisor", "Policy Maker", "Senior Officers", "Sub-Ordinates"].includes(currentRole)
     }
     if (href === "/app/network") {
-      return ["Investigator", "Analyst", "Supervisor"].includes(currentRole)
+      return ["Investigator", "Analyst", "Supervisor", "Senior Officers"].includes(currentRole)
     }
     if (href === "/app/settings") {
-      return ["Supervisor"].includes(currentRole)
+      return ["Supervisor", "Senior Officers"].includes(currentRole)
     }
     return false
   }
@@ -138,8 +151,28 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-[#E2E8F0] bg-white text-[#1E293B] font-sans">
+      {/* Mobile Drawer Top Header with Emblem and Close Button */}
+      <div className="flex items-center justify-between p-3 border-b border-[#E2E8F0] lg:hidden bg-[#F8FAFC]">
+        <div className="flex items-center gap-2">
+          <img src={karnatakaEmblem} alt="KSP Emblem" className="h-6 w-auto object-contain" />
+          <div className="leading-tight">
+            <span className="text-[9px] font-bold text-[#6B7280] uppercase tracking-wider block">KSP Platform</span>
+            <span className="text-xs font-bold text-[#111827]">Navigation Menu</span>
+          </div>
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-2 text-[#6B7280] hover:text-[#111827] hover:bg-[#E2E8F0] rounded-xl transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            aria-label="Close Sidebar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+
       {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3">
+      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-4">
         {filteredMainNav.length > 0 && (
           <CollapsibleSection title={t("sidebar.coreOperations")} items={filteredMainNav} onItemClick={onClose} />
         )}
@@ -153,3 +186,4 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
     </div>
   )
 }
+

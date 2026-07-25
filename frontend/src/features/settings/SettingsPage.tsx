@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { 
-  Palette, Globe, Accessibility, Bell, Shield, Key, 
-  User as UserIcon, Keyboard, Info, Check, LogOut, Camera, Save
+  Globe, Accessibility, Bell, Shield, Key, 
+  Info, Check, LogOut, Save
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,186 +10,134 @@ import { useAuthStore } from "@/store/useAuthStore"
 import { useTranslation } from "react-i18next"
 import { useLanguage } from "@/hooks/useLanguage"
 import { toast } from "sonner"
+import { AboutSystemPage } from "@/features/about/AboutSystemPage"
 
 const SETTINGS_TABS = [
-  { id: "profile", label: "settings.profile", icon: UserIcon },
-  { id: "appearance", label: "settings.appearance", icon: Palette },
+  { id: "security", label: "settings.security", icon: Shield },
+  { id: "password", label: "Change Password", icon: Key },
   { id: "language", label: "settings.language", icon: Globe },
   { id: "accessibility", label: "settings.accessibility", icon: Accessibility },
   { id: "notifications", label: "settings.notifications", icon: Bell },
-  { id: "security", label: "settings.security", icon: Shield },
-  { id: "roles", label: "settings.roles", icon: Key },
-  { id: "shortcuts", label: "settings.shortcuts", icon: Keyboard },
+  { id: "roles", label: "settings.roles", icon: Shield },
   { id: "about", label: "settings.about", icon: Info },
 ]
 
 export function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("profile")
-  const { user, updateUserProfile, logout } = useAuthStore()
+  const [activeTab, setActiveTab] = useState("security")
+  const { user, logout } = useAuthStore()
   const { t } = useTranslation()
 
-  // Profile Form State initialized from authenticated user
-  const [name, setName] = useState(user?.name || "")
-  const [email, setEmail] = useState(user?.email || "")
-  const [phone, setPhone] = useState(user?.phone || "+91 98765 43210")
-  const [department, setDepartment] = useState(user?.department || "State Crime Records Bureau")
-  const [avatar, setAvatar] = useState(user?.avatar || "")
-  const [isSaving, setIsSaving] = useState(false)
+  // Password Form State
+  const [currentPassword, setCurrentPassword] = useState("")
+  const [newPassword, setNewPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
 
-  // Keep form fields synced if user object changes
-  useEffect(() => {
-    if (user) {
-      setName(user.name || "")
-      setEmail(user.email || "")
-      setPhone(user.phone || "+91 98765 43210")
-      setDepartment(user.department || "State Crime Records Bureau")
-      setAvatar(user.avatar || "")
-    }
-  }, [user])
-
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSaving(true)
-    
-    updateUserProfile({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      department: department.trim(),
-      avatar: avatar,
-    })
-
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match. Please verify.")
+      return
+    }
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters.")
+      return
+    }
+    setIsUpdatingPassword(true)
     setTimeout(() => {
-      setIsSaving(false)
-      toast.success(t("settings.profileUpdated", { defaultValue: "Profile updated successfully!" }))
-    }, 300)
-  }
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setAvatar(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const getInitials = (fullName: string) => {
-    if (!fullName) return "KSP"
-    const parts = fullName.trim().split(" ")
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-    }
-    return fullName.slice(0, 2).toUpperCase()
+      setIsUpdatingPassword(false)
+      setCurrentPassword("")
+      setNewPassword("")
+      setConfirmPassword("")
+      toast.success("Security password updated successfully!", {
+        description: "Your login credentials have been updated."
+      })
+    }, 400)
   }
 
   const renderContent = () => {
     switch (activeTab) {
-      case "profile":
+      case "security":
         return (
           <div className="space-y-6 font-sans">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">{t("settings.profile")}</h2>
-              <p className="text-sm text-muted-foreground">{t("settings.profileDesc")}</p>
+              <h2 className="text-xl font-bold text-[#0F172A]">{t("settings.security")}</h2>
+              <p className="text-sm text-[#64748B]">{t("settings.securityDesc")}</p>
             </div>
-            <Card className="rounded-xl border-border/80 shadow-2xs">
+            <Card className="rounded-2xl border-[#E2E8F0] shadow-2xs bg-white">
               <CardContent className="p-6 space-y-6">
-                <form onSubmit={handleSaveProfile} className="space-y-6">
-                  {/* Avatar Upload Area */}
-                  <div className="flex items-center gap-6 pb-4 border-b border-border/60">
-                    <div className="relative group shrink-0">
-                      {avatar ? (
-                        <img 
-                          src={avatar} 
-                          alt="User Avatar" 
-                          className="h-20 w-20 rounded-full object-cover border-2 border-primary shadow-xs" 
-                        />
-                      ) : (
-                        <div className="h-20 w-20 bg-primary/10 border-2 border-primary/30 text-primary flex items-center justify-center rounded-full text-2xl font-extrabold font-mono shadow-xs">
-                          {getInitials(name)}
-                        </div>
-                      )}
-                      <label 
-                        htmlFor="avatar-upload"
-                        className="absolute bottom-0 right-0 p-1.5 rounded-full bg-primary text-primary-foreground shadow-sm cursor-pointer hover:bg-primary/90 transition-colors"
-                        title="Upload Profile Picture"
-                      >
-                        <Camera className="h-3.5 w-3.5" />
-                        <input 
-                          id="avatar-upload" 
-                          type="file" 
-                          accept="image/*" 
-                          className="hidden" 
-                          onChange={handleAvatarChange}
-                        />
-                      </label>
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-bold text-base text-foreground">{name || user?.name}</h3>
-                      <p className="text-xs text-muted-foreground">Badge ID: <span className="font-mono font-bold text-primary">{user?.badgeId}</span></p>
-                      <p className="text-xs text-muted-foreground">Assigned Role: <span className="font-semibold text-foreground">{user?.role || "Citizen"}</span></p>
-                    </div>
+                <div className="space-y-2 border-b border-[#F1F5F9] pb-5">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-[#2563EB]" />
+                    <h3 className="font-bold text-sm text-[#0F172A]">{t("settings.twoFactorAuth")}</h3>
                   </div>
-
-                  {/* Form Inputs Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.fullName")}</label>
-                      <Input 
-                        value={name} 
-                        onChange={(e) => setName(e.target.value)} 
-                        placeholder="Enter full name"
-                        className="h-9 text-xs"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.badgeNumber")}</label>
-                      <Input 
-                        value={user?.badgeId || ""} 
-                        disabled 
-                        className="h-9 text-xs font-mono bg-muted/50 cursor-not-allowed"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.email")}</label>
-                      <Input 
-                        type="email"
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        placeholder="Enter email address"
-                        className="h-9 text-xs"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground leading-none">{t("settings.phoneNumber")}</label>
-                      <Input 
-                        value={phone} 
-                        onChange={(e) => setPhone(e.target.value)} 
-                        placeholder="Enter phone number"
-                        className="h-9 text-xs"
-                      />
-                    </div>
-                    <div className="space-y-1.5 sm:col-span-2">
-                      <label className="text-xs font-semibold text-foreground leading-none">Department / Bureau</label>
-                      <Input 
-                        value={department} 
-                        onChange={(e) => setDepartment(e.target.value)} 
-                        placeholder="Enter department name"
-                        className="h-9 text-xs"
-                      />
-                    </div>
+                  <p className="text-xs text-[#64748B]">{t("settings.twoFactorDesc")}</p>
+                  <Button variant="outline" size="sm" className="mt-2 text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-xs rounded-xl font-semibold">
+                    <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> {t("settings.enabled")}
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-bold text-sm text-[#0F172A]">Active Officer Session</h3>
+                  <p className="text-xs text-[#64748B]">Currently logged in as <strong className="text-[#0F172A]">{user?.name}</strong> ({user?.role})</p>
+                  <Button onClick={() => setActiveTab("password")} variant="secondary" size="sm" className="mt-2 text-xs font-semibold rounded-xl">
+                    Change Password
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      case "password":
+        return (
+          <div className="space-y-6 font-sans">
+            <div>
+              <h2 className="text-xl font-bold text-[#0F172A]">Password & Credentials Management</h2>
+              <p className="text-sm text-[#64748B]">Update your official KSP account password securely.</p>
+            </div>
+            <Card className="rounded-2xl border-[#E2E8F0] shadow-2xs bg-white">
+              <CardContent className="p-6 space-y-6">
+                <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#0F172A]">Current Password</label>
+                    <Input 
+                      type="password" 
+                      value={currentPassword} 
+                      onChange={(e) => setCurrentPassword(e.target.value)} 
+                      placeholder="Enter current password"
+                      className="h-10 text-xs rounded-xl"
+                      required
+                    />
                   </div>
-
-                  <div className="pt-2">
-                    <Button type="submit" disabled={isSaving} className="px-5 font-semibold text-xs h-9">
-                      <Save className="h-4 w-4 mr-2" />
-                      {isSaving ? "Saving..." : t("settings.saveChanges")}
-                    </Button>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#0F172A]">New Password</label>
+                    <Input 
+                      type="password" 
+                      value={newPassword} 
+                      onChange={(e) => setNewPassword(e.target.value)} 
+                      placeholder="Enter new password (min 6 chars)"
+                      className="h-10 text-xs rounded-xl"
+                      required
+                    />
                   </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-[#0F172A]">Confirm New Password</label>
+                    <Input 
+                      type="password" 
+                      value={confirmPassword} 
+                      onChange={(e) => setConfirmPassword(e.target.value)} 
+                      placeholder="Confirm new password"
+                      className="h-10 text-xs rounded-xl"
+                      required
+                    />
+                  </div>
+                  <Button 
+                    type="submit" 
+                    disabled={isUpdatingPassword}
+                    className="bg-[#0F172A] hover:bg-black text-white text-xs font-bold h-10 px-5 rounded-xl cursor-pointer"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {isUpdatingPassword ? "Updating Password..." : "Update Password"}
+                  </Button>
                 </form>
               </CardContent>
             </Card>
@@ -197,88 +145,10 @@ export function SettingsPage() {
         )
       case "language":
         return <LanguageSettingsContent />
-      case "appearance":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-foreground">{t("settings.appearance")}</h2>
-              <p className="text-sm text-muted-foreground">{t("settings.appearanceDesc")}</p>
-            </div>
-            <Card className="rounded-xl border-border/80 shadow-2xs">
-              <CardContent className="p-6 space-y-6">
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">{t("settings.theme")}</h3>
-                  <div className="flex gap-4">
-                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-primary rounded-xl p-2.5 bg-card shadow-2xs">
-                      <div className="w-24 h-16 bg-white rounded-lg border border-slate-200 flex flex-col gap-1 p-1.5">
-                        <div className="w-full h-2 bg-slate-200 rounded"></div>
-                        <div className="w-1/2 h-2 bg-slate-200 rounded"></div>
-                      </div>
-                      <span className="text-xs font-bold text-foreground">{t("settings.lightMode")}</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2 cursor-pointer border-2 border-transparent rounded-xl p-2.5 opacity-50 hover:opacity-100 transition-opacity">
-                      <div className="w-24 h-16 bg-slate-900 rounded-lg border border-slate-800 flex flex-col gap-1 p-1.5">
-                        <div className="w-full h-2 bg-slate-800 rounded"></div>
-                        <div className="w-1/2 h-2 bg-slate-800 rounded"></div>
-                      </div>
-                      <span className="text-xs font-bold text-foreground">{t("settings.darkMode")}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
       case "roles":
         return <AdminRoleManagementContent />
-      case "security":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-foreground">{t("settings.security")}</h2>
-              <p className="text-sm text-muted-foreground">{t("settings.securityDesc")}</p>
-            </div>
-            <Card className="rounded-xl border-border/80 shadow-2xs">
-              <CardContent className="p-6 space-y-4">
-                <div className="space-y-2 border-b border-border/60 pb-4">
-                  <h3 className="font-bold text-sm text-foreground">{t("settings.twoFactorAuth")}</h3>
-                  <p className="text-xs text-muted-foreground">{t("settings.twoFactorDesc")}</p>
-                  <Button variant="outline" size="sm" className="mt-2 text-emerald-700 border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-xs">
-                    <Check className="w-3.5 h-3.5 mr-1.5 text-emerald-600" /> {t("settings.enabled")}
-                  </Button>
-                </div>
-                <div className="space-y-2 pt-2">
-                  <h3 className="font-bold text-sm text-foreground">{t("settings.passwordReset")}</h3>
-                  <p className="text-xs text-muted-foreground">{t("settings.passwordResetDesc")}</p>
-                  <Button variant="secondary" size="sm" className="mt-2 text-xs font-semibold">{t("settings.updatePassword")}</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
       case "about":
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-foreground">{t("settings.about")}</h2>
-              <p className="text-sm text-muted-foreground">{t("settings.aboutDesc")}</p>
-            </div>
-            <Card className="rounded-xl border-border/80 shadow-2xs">
-              <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-4 py-10">
-                <div className="w-14 h-14 bg-primary text-primary-foreground rounded-xl flex items-center justify-center mb-1 shadow-2xs">
-                  <Shield className="w-7 h-7" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">{t("settings.aboutTitle")}</h3>
-                <p className="text-xs text-muted-foreground font-mono">{t("settings.version")}</p>
-                <div className="flex gap-4 mt-4 mb-2 text-xs">
-                  <Button variant="link" size="sm">{t("settings.termsOfService")}</Button>
-                  <Button variant="link" size="sm">{t("settings.privacyPolicy")}</Button>
-                  <Button variant="link" size="sm">{t("settings.releaseNotes")}</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )
+        return <AboutSystemPage />
       default:
         return (
           <div className="space-y-6">

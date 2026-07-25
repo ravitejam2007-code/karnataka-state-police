@@ -17,14 +17,14 @@ export function QuickActions() {
   const navigate = useNavigate()
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card shadow-2xs h-full flex flex-col">
+    <Card className="rounded-xl border-border/80 bg-card shadow-2xs">
       <CardHeader className="p-3.5 border-b border-border/80 pb-2.5 bg-muted/30">
         <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center">
           <Zap className="w-3.5 h-3.5 mr-2 text-primary" />
           {t("dashboard.tacticalActions")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-3.5 flex-1 flex flex-col gap-2 justify-center">
+      <CardContent className="p-3.5 space-y-2">
         {actions.map((action) => (
           <Button 
             key={action.label} 

@@ -26,8 +26,8 @@ export function CasesTable({ cases, onRowClick }: CasesTableProps) {
   }
 
   return (
-    <div className="w-full overflow-auto">
-      <table className="w-full text-sm text-left border-collapse">
+    <div className="w-full overflow-x-auto">
+      <table className="w-full min-w-[750px] text-sm text-left border-collapse">
         <thead className="text-xs text-muted-foreground uppercase bg-muted/50 sticky top-0 z-10">
           <tr>
             <th className="px-4 py-3 font-medium">FIR Number</th>

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { 
   ReactFlow, 
   MiniMap, 
@@ -22,8 +22,13 @@ interface Props {
 }
 
 export function NetworkGraph({ data, onNodeClick }: Props) {
-  const [nodes, , onNodesChange] = useNodesState(data.nodes);
-  const [edges, , onEdgesChange] = useEdgesState(data.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(data.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(data.edges);
+
+  useEffect(() => {
+    setNodes(data.nodes);
+    setEdges(data.edges);
+  }, [data, setNodes, setEdges]);
 
   const handleNodeClick: NodeMouseHandler = useCallback((_, node) => {
     onNodeClick(node as NetworkNode);

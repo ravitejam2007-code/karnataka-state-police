@@ -3,11 +3,13 @@ import { persist } from "zustand/middleware"
 
 export type Role =
   | "Administrator"
+  | "Senior Officers"
   | "Police Officer"
   | "Investigator"
   | "Analyst"
   | "Supervisor"
   | "Policy Maker"
+  | "Sub-Ordinates"
   | "Citizen"
 
 export interface User {
@@ -15,6 +17,8 @@ export interface User {
   name: string
   email: string
   role: Role
+  assignedRoles?: Role[]
+  isRoleSelected?: boolean
   department: string
   badgeId: string
   phone?: string
@@ -27,6 +31,7 @@ export interface RegisteredUser {
   email: string
   password: string
   role: Role
+  assignedRoles?: Role[]
   department: string
   badgeId: string
   mobile?: string
@@ -52,7 +57,7 @@ interface AuthState {
     fullName: string
     email: string
     password: string
-    role: Role
+    role?: Role
     badgeId?: string
     department?: string
     mobile?: string
@@ -60,6 +65,7 @@ interface AuthState {
   updateUserProfile: (updatedFields: Partial<User>) => void
   verifyOtp: (otp: string) => Promise<boolean>
   updateUserRole: (userId: string, newRole: Role) => void
+  setActiveRole: (role: Role) => void
   logout: () => void
 }
 
@@ -70,6 +76,7 @@ const DEFAULT_USERS: RegisteredUser[] = [
     email: "ravitejam2007@gmail.com",
     password: "admin123",
     role: "Administrator",
+    assignedRoles: ["Administrator", "Senior Officers", "Police Officer", "Investigator", "Analyst", "Supervisor", "Policy Maker", "Sub-Ordinates"],
     department: "State Crime Records Bureau",
     badgeId: "KSP-2007",
     mobile: "+91 91234 56789",
@@ -79,7 +86,8 @@ const DEFAULT_USERS: RegisteredUser[] = [
     fullName: "Insp. R. Kumar",
     email: "r.kumar@ksp.gov.in",
     password: "password123",
-    role: "Investigator",
+    role: "Senior Officers",
+    assignedRoles: ["Senior Officers", "Police Officer", "Investigator", "Analyst", "Supervisor", "Sub-Ordinates"],
     department: "Cyber Crime Division",
     badgeId: "KSP-9824",
     mobile: "+91 98765 43210",
@@ -90,6 +98,7 @@ const DEFAULT_USERS: RegisteredUser[] = [
     email: "ananya.analyst@ksp.gov.in",
     password: "password123",
     role: "Analyst",
+    assignedRoles: ["Analyst", "Senior Officers", "Police Officer", "Investigator", "Sub-Ordinates"],
     department: "Crime Analytics Cell",
     badgeId: "KSP-3341",
     mobile: "+91 97766 55443",
@@ -100,6 +109,7 @@ const DEFAULT_USERS: RegisteredUser[] = [
     email: "suresh.citizen@gmail.com",
     password: "citizen123",
     role: "Citizen",
+    assignedRoles: ["Citizen"],
     department: "Public Citizen Services",
     badgeId: "N/A",
     mobile: "+91 99887 76655",
@@ -129,11 +139,23 @@ export const useAuthStore = create<AuthState>()(
 
         if (foundUser) {
           if (foundUser.password === password || password === "admin123") {
+            const rawRoles: Role[] = foundUser.assignedRoles || (
+              foundUser.role === "Citizen"
+                ? ["Citizen"]
+                : foundUser.role === "Administrator"
+                ? ["Administrator", "Senior Officers", "Police Officer", "Investigator", "Analyst", "Supervisor", "Policy Maker", "Sub-Ordinates"]
+                : [foundUser.role, "Senior Officers", "Police Officer", "Investigator", "Analyst", "Supervisor", "Sub-Ordinates"]
+            )
+            const assignedRoles: Role[] = Array.from(new Set(rawRoles))
+            const isSingleRole = assignedRoles.length === 1
+
             const userPayload: User = {
               id: foundUser.id,
               name: foundUser.fullName,
               email: foundUser.email,
               role: foundUser.role,
+              assignedRoles: assignedRoles,
+              isRoleSelected: isSingleRole,
               department: foundUser.department || "State Crime Records Bureau",
               badgeId: foundUser.badgeId || "N/A",
               phone: foundUser.mobile || "+91 98765 43210",
@@ -171,11 +193,14 @@ export const useAuthStore = create<AuthState>()(
             ? identifier.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
             : identifier
 
+          const assignedRoles: Role[] = ["Administrator", "Police Officer", "Investigator", "Analyst", "Supervisor", "Policy Maker"]
           const userPayload: User = {
             id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
             name: formattedName,
             email: isEmail ? identifier : `${identifier.toLowerCase()}@ksp.gov.in`,
             role: "Administrator",
+            assignedRoles: assignedRoles,
+            isRoleSelected: false,
             department: "State Crime Records Bureau",
             badgeId: isEmail ? `KSP-${Math.floor(1000 + Math.random() * 9000)}` : identifier,
             phone: "+91 98765 43210",
@@ -224,13 +249,20 @@ export const useAuthStore = create<AuthState>()(
           return { success: false, errorKey: "auth.userAlreadyExists" }
         }
 
-        const isCitizen = newUser.role === "Citizen"
+        const targetRole: Role = newUser.role || (cleanBadgeId && cleanBadgeId !== "n/a" ? "Police Officer" : "Citizen")
+        const isCitizen = targetRole === "Citizen"
+        const rawRoles: Role[] = isCitizen
+          ? ["Citizen"]
+          : [targetRole, "Police Officer", "Investigator", "Analyst", "Supervisor", "Policy Maker"]
+        const assignedRoles: Role[] = Array.from(new Set(rawRoles))
+
         const createdUser: RegisteredUser = {
           id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
           fullName: newUser.fullName,
           email: newUser.email,
           password: newUser.password,
-          role: newUser.role,
+          role: targetRole,
+          assignedRoles: assignedRoles,
           badgeId: isCitizen ? "N/A" : (newUser.badgeId || `KSP-${Math.floor(1000 + Math.random() * 9000)}`),
           department: newUser.department || (isCitizen ? "Public Citizen Services" : "Karnataka State Police Headquarters"),
           mobile: newUser.mobile || "+91 98765 43210",
@@ -297,6 +329,19 @@ export const useAuthStore = create<AuthState>()(
         set({ registeredUsers: updated })
       },
 
+      setActiveRole: (role) => {
+        const currentUser = get().user
+        if (currentUser) {
+          set({
+            user: {
+              ...currentUser,
+              role: role,
+              isRoleSelected: true,
+            }
+          })
+        }
+      },
+
       logout: () => {
         set({ isAuthenticated: false, token: null, user: null })
       },
@@ -306,5 +351,6 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 )
+
 
 

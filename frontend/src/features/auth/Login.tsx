@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate, Link, useSearchParams, useLocation } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -26,24 +26,9 @@ type LoginForm = z.infer<typeof loginSchema>
 export function Login() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const location = useLocation()
-  const portalParam = searchParams.get("portal") || (location.state as { portal?: string })?.portal
 
-  const isCitizen = portalParam === "citizen"
-  const isEmployee = portalParam === "employee"
-
-  const portalTitle = isCitizen
-    ? "Citizen Login"
-    : isEmployee
-    ? "Officer / Employee Login"
-    : t("auth.login")
-
-  const portalDesc = isCitizen
-    ? "Access citizen services, file online complaints, & track FIR status"
-    : isEmployee
-    ? "Authorized login for SCRB personnel, CCB officers, & investigators"
-    : t("auth.authDesc")
+  const portalTitle = "Citizen Login"
+  const portalDesc = "Access citizen services, file online complaints, & track FIR status"
 
   const { login } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
@@ -65,9 +50,14 @@ export function Login() {
     try {
       const result = await login(data.badgeId, data.password)
       
-      if (result.success) {
+      if (result.success && result.user) {
         toast.success(t("auth.loginSuccess", { defaultValue: "Login successful. Welcome back!" }))
-        navigate("/auth/role-selection")
+        const roles = result.user.assignedRoles || [result.user.role]
+        if (roles.length > 1 && !result.user.isRoleSelected) {
+          navigate("/auth/role-selection")
+        } else {
+          navigate("/app/dashboard")
+        }
       } else {
         const errorMsg = result.customMessage || (result.errorKey
           ? t(result.errorKey, { defaultValue: "Authentication error" })
@@ -82,42 +72,43 @@ export function Login() {
   }
 
   return (
-    <Card className="w-full shadow-xs border-t-4 border-t-[#2563EB] border-[#E2E8F0] bg-white font-sans">
-      <CardHeader className="space-y-1 text-center px-4 sm:px-6 pb-3 pt-4 sm:pt-5">
-        <div className="mx-auto flex flex-col items-center justify-center space-y-1">
+    <Card className="w-full shadow-md border-t-4 border-t-[#0F172A] border-[#E2E8F0] bg-white font-sans rounded-xl">
+      <CardHeader className="space-y-0.5 text-center px-4 sm:px-6 pb-2 pt-3 border-b border-[#F1F5F9]">
+        <div className="mx-auto flex flex-col items-center justify-center space-y-0.5">
           <img 
             src={karnatakaEmblem} 
             alt="Karnataka State Police Emblem" 
-            className="h-10 sm:h-11 w-auto object-contain" 
+            className="h-8 sm:h-9 w-auto object-contain" 
           />
-          <span className="text-[9px] font-extrabold tracking-widest text-[#2563EB] uppercase">{t("header.ksp")}</span>
+          <span className="text-[8px] font-extrabold tracking-widest text-[#0F172A] uppercase">{t("header.ksp")}</span>
         </div>
-        <CardTitle className="text-lg sm:text-xl font-bold tracking-tight text-[#1E293B]">{portalTitle}</CardTitle>
-        <CardDescription className="text-xs text-[#475569]">
+        <CardTitle className="text-base font-bold tracking-tight text-[#0F172A]">{portalTitle}</CardTitle>
+        <CardDescription className="text-[11px] text-[#475569]">
           {portalDesc}
         </CardDescription>
       </CardHeader>
-      <CardContent className="px-4 sm:px-6 pb-4">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold text-[#1E293B]" htmlFor="badgeId">
+
+      <CardContent className="px-4 sm:px-6 py-3">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+          <div className="space-y-0.5">
+            <label className="text-[11px] font-semibold text-[#0F172A]" htmlFor="badgeId">
               {t("auth.badgeId")}
             </label>
             <Input 
               id="badgeId" 
               placeholder={t("auth.badgeIdPlaceholder")} 
               {...register("badgeId")}
-              className={`h-9 text-xs border-[#E2E8F0] focus-visible:ring-[#1E3A8A] ${errors.badgeId ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              className={`h-8 text-xs border-[#E2E8F0] focus-visible:ring-[#0F172A] ${errors.badgeId ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
-            {errors.badgeId && <p className="text-[11px] text-destructive mt-0.5">{errors.badgeId.message}</p>}
+            {errors.badgeId && <p className="text-[10px] text-destructive mt-0.5">{errors.badgeId.message}</p>}
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-[#1E293B]" htmlFor="password">
+              <label className="text-[11px] font-semibold text-[#0F172A]" htmlFor="password">
                 {t("auth.password")}
               </label>
-              <Link to="/auth/forgot-password" className="text-[11px] text-[#1E3A8A] hover:underline" tabIndex={-1}>
+              <Link to="/auth/forgot-password" className="text-[11px] font-medium text-[#0F172A] hover:underline" tabIndex={-1}>
                 {t("auth.forgotPassword")}
               </Link>
             </div>
@@ -127,7 +118,7 @@ export function Login() {
                 type={showPassword ? "text" : "password"} 
                 placeholder={t("auth.passwordPlaceholder")} 
                 {...register("password")}
-                className={`h-9 text-xs pr-9 border-[#E2E8F0] focus-visible:ring-[#1E3A8A] ${errors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                className={`h-8 text-xs pr-8 border-[#E2E8F0] focus-visible:ring-[#0F172A] ${errors.password ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
               <button
                 type="button"
@@ -138,11 +129,11 @@ export function Login() {
                 {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
             </div>
-            {errors.password && <p className="text-[11px] text-destructive mt-0.5">{errors.password.message}</p>}
+            {errors.password && <p className="text-[10px] text-destructive mt-0.5">{errors.password.message}</p>}
           </div>
 
-          <div className="space-y-1 pt-2 border-t border-[#E2E8F0]">
-            <label className="text-xs font-semibold text-[#1E293B]" htmlFor="captcha">
+          <div className="space-y-1.5 pt-2 border-t border-[#E2E8F0] flex flex-col">
+            <label className="text-[11px] font-semibold text-[#0F172A]" htmlFor="captcha">
               {t("auth.securityNotice")}
             </label>
             <CaptchaPlaceholder onCaptchaChange={setCaptchaText} />
@@ -150,19 +141,19 @@ export function Login() {
               id="captcha" 
               placeholder={t("auth.captchaPlaceholder")} 
               {...register("captcha")}
-              className={`h-9 text-xs border-[#E2E8F0] focus-visible:ring-[#1E3A8A] ${errors.captcha ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              className={`h-8 text-xs border-[#E2E8F0] focus-visible:ring-[#0F172A] ${errors.captcha ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
-            {errors.captcha && <p className="text-[11px] text-destructive mt-0.5">{errors.captcha.message}</p>}
+            {errors.captcha && <p className="text-[10px] text-destructive mt-0.5">{errors.captcha.message}</p>}
           </div>
 
           <div className="flex items-center gap-2 pt-0.5">
-            <input type="checkbox" id="remember" className="rounded border-input text-[#1E3A8A] focus:ring-[#1E3A8A] h-3.5 w-3.5" />
-            <label htmlFor="remember" className="text-xs text-[#475569] select-none cursor-pointer">
+            <input type="checkbox" id="remember" className="rounded border-input text-[#0F172A] focus:ring-[#0F172A] h-3.5 w-3.5" />
+            <label htmlFor="remember" className="text-[11px] text-[#475569] select-none cursor-pointer">
               {t("auth.rememberDevice")}
             </label>
           </div>
 
-          <Button type="submit" className="w-full h-9 font-semibold text-xs bg-[#1E3A8A] text-white hover:bg-[#1D4ED8]" disabled={isLoading}>
+          <Button type="submit" className="w-full h-8.5 font-bold text-xs bg-[#0F172A] text-white hover:bg-[#1E293B] rounded-md shadow-2xs cursor-pointer" disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
             ) : (
@@ -172,10 +163,11 @@ export function Login() {
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex items-center justify-between gap-2 border-t border-[#E2E8F0] p-3 sm:px-6 bg-[#F8FAFC] rounded-b-lg text-xs">
+
+      <CardFooter className="flex items-center justify-between gap-2 border-t border-[#E2E8F0] py-2 px-4 sm:px-6 bg-[#F8FAFC] rounded-b-xl text-[11px]">
         <span className="text-[#475569]">Don't have an account?</span>
         <Link to="/auth/register">
-          <Button variant="outline" size="sm" className="h-8 font-semibold text-xs text-[#1E3A8A] border-[#1E3A8A]/30 hover:bg-[#1E3A8A]/5">
+          <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] font-semibold text-[#0F172A] border-[#0F172A]/30 hover:bg-[#0F172A]/5 cursor-pointer">
             Create Account
           </Button>
         </Link>

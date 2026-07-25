@@ -6,7 +6,6 @@ import { ErrorBoundary } from "@/providers/ErrorBoundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AnimatePresence, motion } from "framer-motion"
 import { PageTransition } from "./PageTransition"
-import { GovernmentFooter } from "./GovernmentFooter"
 import { GlobalSearchDialog } from "./GlobalSearchDialog"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
@@ -17,11 +16,14 @@ export function MainLayout() {
   const isNetworkPage = location.pathname.startsWith('/app/network') || location.pathname.startsWith('/network')
   const isEdgeToEdge = isAIPage || isNetworkPage
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  // Default expanded on desktop viewports, collapsed on mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window !== 'undefined' && window.innerWidth >= 1024)
 
   // Auto-close mobile sidebar drawer on route change
   useEffect(() => {
-    setIsSidebarOpen(false)
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false)
+    }
   }, [location.pathname])
 
   useEffect(() => {
@@ -34,7 +36,9 @@ export function MainLayout() {
       // Esc to close drawers/search
       if (e.key === "Escape") {
         setIsSearchOpen(false)
-        setIsSidebarOpen(false)
+        if (window.innerWidth < 1024) {
+          setIsSidebarOpen(false)
+        }
       }
       // Ctrl + / for Help
       if (e.key === "/" && (e.metaKey || e.ctrlKey)) {
@@ -68,20 +72,22 @@ export function MainLayout() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden fixed inset-0 bg-slate-900/40 z-40"
+              className="lg:hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-40"
             />
           )}
         </AnimatePresence>
 
-        {/* Collapsible Sidebar */}
-        <aside className={`transition-all duration-300 ease-in-out z-50 bg-card shrink-0 h-full overflow-hidden ${
-          isSidebarOpen ? "w-64 opacity-100 border-r border-[#E2E8F0]" : "w-0 opacity-0 border-none"
+        {/* Responsive Sidebar Container: Off-canvas drawer on mobile, in-flow collapsible on desktop */}
+        <aside className={`fixed lg:static inset-y-0 left-0 z-50 bg-card shrink-0 h-full overflow-hidden transition-all duration-300 ease-in-out ${
+          isSidebarOpen 
+            ? "translate-x-0 w-64 opacity-100 border-r border-[#E2E8F0] shadow-2xl lg:shadow-none" 
+            : "-translate-x-full lg:translate-x-0 lg:w-0 lg:opacity-0 border-none"
         }`}>
           <Sidebar onClose={() => setIsSidebarOpen(false)} />
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-hidden bg-muted/30">
+        <main className="flex-1 overflow-hidden bg-[#F8FAFC]">
           <ErrorBoundary>
             <Suspense fallback={
               <div className="h-full w-full p-4 md:p-8 flex flex-col gap-6 overflow-y-auto">
@@ -100,15 +106,16 @@ export function MainLayout() {
                 <Skeleton className="flex-1 w-full rounded-xl" />
               </div>
             }>
-              <div className={`h-full w-full overflow-y-auto ${!isEdgeToEdge ? 'container mx-auto p-3 sm:p-4 md:p-6 lg:p-8' : ''} flex flex-col`}>
-                <AnimatePresence mode="wait">
-                  <PageTransition>
-                    <div className="flex-1 flex flex-col">
-                      <Outlet />
-                    </div>
-                  </PageTransition>
-                </AnimatePresence>
-                {!isEdgeToEdge && <GovernmentFooter />}
+              <div className="h-full w-full overflow-y-auto flex flex-col">
+                <div className={`flex-1 ${!isEdgeToEdge ? 'container mx-auto p-3 sm:p-4 md:p-6 lg:p-8' : 'w-full'} flex flex-col`}>
+                  <AnimatePresence mode="wait">
+                    <PageTransition>
+                      <div className="flex-1 flex flex-col">
+                        <Outlet />
+                      </div>
+                    </PageTransition>
+                  </AnimatePresence>
+                </div>
               </div>
             </Suspense>
           </ErrorBoundary>

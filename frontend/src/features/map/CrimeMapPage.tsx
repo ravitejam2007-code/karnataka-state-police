@@ -126,13 +126,19 @@ export function CrimeMapPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="absolute top-4 left-4 z-30 w-72 bg-white/95 backdrop-blur border border-[#E2E8F0] rounded-xl shadow-lg p-4 space-y-4 font-sans text-xs text-[#1E293B]"
+              className="absolute top-3 left-3 sm:top-4 sm:left-4 z-30 w-[calc(100vw-2.5rem)] max-w-xs sm:w-72 bg-white/95 backdrop-blur border border-[#E2E8F0] rounded-xl shadow-lg p-3.5 sm:p-4 space-y-3 sm:space-y-4 font-sans text-xs text-[#1E293B]"
             >
               <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-2 font-bold uppercase tracking-wider text-[11px]">
                 <span className="flex items-center gap-1.5 text-[#2563EB]">
                   <Layers className="h-4 w-4" /> Layer Visibility
                 </span>
-                <button onClick={() => setShowFilterDrawer(false)} className="text-[#64748B] hover:text-[#1E293B]">✕</button>
+                <button 
+                  onClick={() => setShowFilterDrawer(false)} 
+                  className="text-[#64748B] hover:text-[#1E293B] p-1 rounded-lg min-h-[36px] min-w-[36px] flex items-center justify-center cursor-pointer"
+                  aria-label="Close Controls"
+                >
+                  ✕
+                </button>
               </div>
 
               {/* Layer Toggles */}
@@ -146,7 +152,7 @@ export function CrimeMapPage() {
                     type="checkbox"
                     checked={filters.showHeatmap}
                     onChange={(e) => setFilters(f => ({ ...f, showHeatmap: e.target.checked }))}
-                    className="accent-[#2563EB]"
+                    className="accent-[#2563EB] h-4 w-4"
                   />
                 </label>
 
@@ -159,7 +165,7 @@ export function CrimeMapPage() {
                     type="checkbox"
                     checked={filters.showClusters}
                     onChange={(e) => setFilters(f => ({ ...f, showClusters: e.target.checked }))}
-                    className="accent-[#2563EB]"
+                    className="accent-[#2563EB] h-4 w-4"
                   />
                 </label>
 
@@ -172,7 +178,7 @@ export function CrimeMapPage() {
                     type="checkbox"
                     checked={filters.showPoliceStations}
                     onChange={(e) => setFilters(f => ({ ...f, showPoliceStations: e.target.checked }))}
-                    className="accent-[#2563EB]"
+                    className="accent-[#2563EB] h-4 w-4"
                   />
                 </label>
               </div>
@@ -209,15 +215,15 @@ export function CrimeMapPage() {
         )}
 
         {/* Floating Bottom Left Telemetry Status */}
-        <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur border border-[#E2E8F0] px-3.5 py-2 rounded-lg shadow-md flex items-center gap-4 text-[11px] text-[#475569] font-mono">
+        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 bg-white/95 backdrop-blur border border-[#E2E8F0] px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg shadow-md flex items-center gap-2 sm:gap-4 flex-wrap text-[10px] sm:text-[11px] text-[#475569] font-mono">
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-bold text-[#1E293B]">GIS Live Telemetry</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="font-bold text-[#1E293B]">GIS Telemetry</span>
           </div>
-          <span className="text-[#CBD5E1]">|</span>
+          <span className="text-[#CBD5E1] hidden sm:inline">|</span>
           <div>Total Incidents: <strong className="text-[#2563EB]">{filteredIncidents.length}</strong></div>
-          <span className="text-[#CBD5E1]">|</span>
-          <div>Lat/Lng: 15.3173° N, 75.7139° E</div>
+          <span className="text-[#CBD5E1] hidden sm:inline">|</span>
+          <div className="hidden xs:block">15.3173° N, 75.7139° E</div>
         </div>
 
       </div>

@@ -43,7 +43,7 @@ export function ImportantNotifications() {
   const navigate = useNavigate()
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card shadow-2xs h-full flex flex-col">
+    <Card className="rounded-xl border-border/80 bg-card shadow-2xs">
       <CardHeader className="p-3.5 border-b border-border/80 pb-2.5 bg-muted/30">
         <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center justify-between">
           <div className="flex items-center">
@@ -53,7 +53,7 @@ export function ImportantNotifications() {
           <span className="text-[10px] bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full border border-primary/20">{t("dashboard.unread", { count: 4 })}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0 flex-1 overflow-y-auto">
+      <CardContent className="p-0">
         <div className="divide-y divide-border/60">
           {notifications.map((notif) => (
             <div 

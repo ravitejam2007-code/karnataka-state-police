@@ -34,29 +34,29 @@ export function CaptchaPlaceholder({ onCaptchaChange }: { onCaptchaChange?: (cap
   }
 
   return (
-    <div className="space-y-1">
+    <div className="py-0.5">
       <div className="flex items-center gap-2">
-        <div className="flex h-10 w-32 items-center justify-center rounded bg-muted font-mono text-base font-bold tracking-widest text-muted-foreground select-none pointer-events-none relative overflow-hidden">
-          <div className="absolute inset-0 opacity-20" 
-               style={{ backgroundImage: 'radial-gradient(circle, var(--foreground) 1px, transparent 1px)', backgroundSize: '4px 4px' }} 
+        <div className="flex h-9 w-28 items-center justify-center rounded-md bg-slate-100 font-mono text-sm font-bold tracking-widest text-[#0F172A] select-none pointer-events-none relative overflow-hidden border border-slate-200 shadow-2xs">
+          <div className="absolute inset-0 opacity-15" 
+               style={{ backgroundImage: 'radial-gradient(circle, #0F172A 1px, transparent 1px)', backgroundSize: '4px 4px' }} 
           />
           {captchaText}
         </div>
         <button 
           type="button" 
           onClick={handleReload}
-          className="flex h-10 w-10 items-center justify-center rounded border border-input hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[#E2E8F0] bg-white hover:bg-slate-50 text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer shadow-2xs"
           title={t("auth.reloadCaptcha")}
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className="h-3.5 w-3.5" />
         </button>
         <button 
           type="button" 
           onClick={handleAudio}
-          className="flex h-10 w-10 items-center justify-center rounded border border-input hover:bg-accent hover:text-accent-foreground transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-[#E2E8F0] bg-white hover:bg-slate-50 text-[#475569] hover:text-[#0F172A] transition-colors cursor-pointer shadow-2xs"
           title={t("auth.playCaptcha")}
         >
-          <Volume2 className="h-4 w-4" />
+          <Volume2 className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>

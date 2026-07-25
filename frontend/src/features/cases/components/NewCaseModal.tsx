@@ -98,23 +98,24 @@ export function NewCaseModal({ isOpen, onClose, onCaseCreated }: NewCaseModalPro
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in-50 font-sans">
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-2xl max-w-xl w-full p-6 space-y-5 text-[#1F2937] overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in-50 font-sans">
+      <div className="bg-white rounded-2xl sm:rounded-xl border border-[#E2E8F0] shadow-2xl max-w-xl w-[95vw] sm:w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-5 text-[#1F2937]">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-[#0F172A] text-white">
+            <div className="p-2 rounded-lg bg-[#0F172A] text-white shrink-0">
               <Shield className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-[#1F2937]">Register New Case File</h2>
-              <p className="text-xs text-[#64748B]">State Crime Records Bureau • Official FIR Logging</p>
+              <h2 className="text-sm sm:text-base font-bold text-[#1F2937]">Register New Case File</h2>
+              <p className="text-[10px] sm:text-xs text-[#64748B]">State Crime Records Bureau • Official FIR Logging</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-100 text-[#64748B] hover:text-[#1F2937] transition-colors"
+            className="p-2 rounded-xl hover:bg-slate-100 text-[#64748B] hover:text-[#1F2937] transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>

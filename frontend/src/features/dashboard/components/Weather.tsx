@@ -6,15 +6,15 @@ export function Weather() {
   const { t } = useTranslation()
 
   return (
-    <Card className="rounded-xl border-border/80 bg-card shadow-2xs h-full flex flex-col">
+    <Card className="rounded-xl border-border/80 bg-card shadow-2xs">
       <CardHeader className="p-3.5 border-b border-border/80 pb-2.5 bg-muted/30">
         <CardTitle className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center">
           <CloudRainWind className="w-3.5 h-3.5 mr-2 text-primary" />
           {t("dashboard.weather")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 flex-1">
-        <div className="flex items-center justify-between mb-5">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-3xl font-mono font-bold tracking-tight text-foreground">24°C</h3>
             <p className="text-[10px] uppercase font-bold text-muted-foreground">{t("dashboard.bengaluruHq")}</p>
@@ -25,7 +25,7 @@ export function Weather() {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-3 mt-auto">
+        <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center space-x-2 border border-border/60 p-2 rounded-lg bg-muted/40">
             <Thermometer className="h-4 w-4 text-primary shrink-0" />
             <div>

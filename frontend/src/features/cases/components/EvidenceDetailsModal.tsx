@@ -50,30 +50,31 @@ export function EvidenceDetailsModal({ isOpen, onClose, evidence }: EvidenceDeta
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in-50 font-sans">
-      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-2xl max-w-2xl w-full p-6 space-y-5 text-[#1F2937] overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in-50 font-sans">
+      <div className="bg-white rounded-2xl sm:rounded-xl border border-[#E2E8F0] shadow-2xl max-w-2xl w-[95vw] sm:w-full p-4 sm:p-6 space-y-4 sm:space-y-5 text-[#1F2937] max-h-[85vh] sm:max-h-[90vh] flex flex-col">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-slate-100 border border-slate-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 rounded-lg bg-slate-100 border border-slate-200 shrink-0">
               {getCategoryIcon(evidence.category)}
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-[#1F2937]">{evidence.title}</h3>
-                <span className="bg-slate-200 text-[#1F2937] text-[10px] font-mono font-bold px-1.5 py-0.5 rounded">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-xs sm:text-base font-bold text-[#1F2937]">{evidence.title}</h3>
+                <span className="bg-slate-200 text-[#1F2937] text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded">
                   {evidence.id}
                 </span>
               </div>
-              <p className="text-xs text-[#64748B]">
+              <p className="text-[10px] sm:text-xs text-[#64748B]">
                 Type: {evidence.category} • Size: {evidence.size} • Date Logged: {evidence.date}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-100 text-[#64748B] hover:text-[#1F2937]"
+            className="p-2 rounded-xl hover:bg-slate-100 text-[#64748B] hover:text-[#1F2937] min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>

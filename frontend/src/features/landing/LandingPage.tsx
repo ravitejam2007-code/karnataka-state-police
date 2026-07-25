@@ -92,12 +92,7 @@ function Navbar() {
           {/* Right Section (Language & Direct Logins) */}
           <div className="hidden md:flex items-center gap-3">
             <LanguageSwitcher />
-            <Link to="/auth/login?portal=employee">
-              <Button variant="outline" size="sm" className="border-slate-300 text-[#1E293B] hover:bg-slate-50 font-medium text-xs sm:text-sm h-10 px-4 rounded-md cursor-pointer">
-                {t("landing.navbar.employeeLogin")}
-              </Button>
-            </Link>
-            <Link to="/auth/login?portal=citizen">
+            <Link to="/auth/login">
               <Button size="sm" className="bg-[#111827] text-white hover:bg-slate-800 font-semibold text-xs sm:text-sm h-10 px-4 rounded-md shadow-2xs cursor-pointer">
                 <Shield className="h-4 w-4 mr-1.5" />
                 {t("landing.navbar.citizenLogin")}
@@ -141,14 +136,10 @@ function Navbar() {
                   <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Language</span>
                   <LanguageSwitcher />
                 </div>
-                <div className="flex gap-2">
-                  <Link to="/auth/login?portal=employee" className="flex-1" onClick={() => setMobileOpen(false)}>
-                    <Button variant="outline" size="sm" className="w-full border-slate-300 text-[#1E293B]">
-                      {t("landing.navbar.employeeLogin")}
-                    </Button>
-                  </Link>
-                  <Link to="/auth/login?portal=citizen" className="flex-1" onClick={() => setMobileOpen(false)}>
-                    <Button size="sm" className="w-full bg-[#111827] text-white">
+                <div>
+                  <Link to="/auth/login" className="w-full block" onClick={() => setMobileOpen(false)}>
+                    <Button size="sm" className="w-full bg-[#111827] text-white font-semibold">
+                      <Shield className="h-4 w-4 mr-1.5" />
                       {t("landing.navbar.citizenLogin")}
                     </Button>
                   </Link>
