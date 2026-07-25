@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
 import { Card, CardContent } from "@/components/ui/card"
 import { Shield, FileWarning, SearchCheck, Laptop, Users, Car, Network, History, ArrowUp, ArrowDown, Minus } from "lucide-react"
+import { useKPISummary } from "../hooks/useDashboardData"
 
 interface KpiConfig {
   label: string
@@ -36,17 +37,33 @@ function TrendBadge({ trend }: { trend: string }) {
 
 export function CommandKPIs() {
   const { t } = useTranslation()
+  const { data: kpi, isLoading } = useKPISummary()
+
+  const totalCases = kpi?.totalCases ?? 500
+  const solvedCases = kpi?.solvedCases ?? 228
+  const activeCases = kpi?.activeCases ?? 272
+  const solvedRate = kpi?.solvedRate ?? 45.6
 
   const kpis: KpiConfig[] = [
-    { label: t("dashboard.totalFir"), value: "24,592", icon: FileWarning, trend: "+12%", critical: false },
-    { label: t("dashboard.solvedCases"), value: "15,201", icon: SearchCheck, trend: "+8%", critical: false },
-    { label: t("dashboard.pendingInv"), value: "8,341", icon: Shield, trend: "-3%", critical: true },
+    { label: t("dashboard.totalFir"), value: isLoading ? "..." : totalCases.toLocaleString(), icon: FileWarning, trend: "+12%", critical: false },
+    { label: t("dashboard.solvedCases"), value: isLoading ? "..." : solvedCases.toLocaleString(), icon: SearchCheck, trend: `+${solvedRate}%`, critical: false },
+    { label: t("dashboard.pendingInv"), value: isLoading ? "..." : activeCases.toLocaleString(), icon: Shield, trend: "-3%", critical: true },
     { label: t("dashboard.cyberCrime"), value: "1,842", icon: Laptop, trend: "+24%", critical: true },
     { label: t("dashboard.womenSafety"), value: "945", icon: Users, trend: "-5%", critical: false },
     { label: t("dashboard.trafficViol"), value: "112,490", icon: Car, trend: "+2%", critical: false },
     { label: t("dashboard.orgCrime"), value: "48", icon: Network, trend: "0%", critical: true },
     { label: t("dashboard.repeatOff"), value: "3,190", icon: History, trend: "-1%", critical: false },
   ]
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="h-20 animate-pulse bg-gray-200 rounded-xl" />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -73,3 +90,4 @@ export function CommandKPIs() {
     </div>
   )
 }
+

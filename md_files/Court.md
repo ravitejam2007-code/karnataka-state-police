@@ -1,0 +1,46 @@
+# Court
+
+Row count: 40
+
+|   CourtID | CourtName                                   |   DistrictID |   StateID | Active   |
+|----------:|:--------------------------------------------|-------------:|----------:|:---------|
+|         1 | Special Court (POCSO), Bengaluru City       |            1 |         1 | True     |
+|         2 | Court of Civil Judge, Bengaluru City        |            1 |         1 | True     |
+|         3 | Court of Civil Judge, Bengaluru Rural       |            2 |         1 | True     |
+|         4 | Fast Track Court, Bengaluru Rural           |            2 |         1 | True     |
+|         5 | Fast Track Court, Mysuru                    |            3 |         1 | True     |
+|         6 | District & Sessions Court, Mysuru           |            3 |         1 | True     |
+|         7 | Special Court (POCSO), Hubballi-Dharwad     |            4 |         1 | True     |
+|         8 | Special Court (POCSO), Hubballi-Dharwad     |            4 |         1 | True     |
+|         9 | Family Court, Belagavi                      |            5 |         1 | True     |
+|        10 | Court of Civil Judge, Belagavi              |            5 |         1 | True     |
+|        11 | Special Court (POCSO), Mangaluru (D.K.)     |            6 |         1 | True     |
+|        12 | District & Sessions Court, Mangaluru (D.K.) |            6 |         1 | True     |
+|        13 | Special Court (NDPS), Kalaburagi            |            7 |         1 | True     |
+|        14 | Special Court (NDPS), Kalaburagi            |            7 |         1 | True     |
+|        15 | Special Court (NDPS), Ballari               |            8 |         1 | True     |
+|        16 | Court of JMFC, Ballari                      |            8 |         1 | True     |
+|        17 | Court of Civil Judge, Vijayapura            |            9 |         1 | True     |
+|        18 | Special Court (NDPS), Vijayapura            |            9 |         1 | True     |
+|        19 | Court of JMFC, Shivamogga                   |           10 |         1 | True     |
+|        20 | Special Court (NDPS), Shivamogga            |           10 |         1 | True     |
+|        21 | District & Sessions Court, Tumakuru         |           11 |         1 | True     |
+|        22 | Fast Track Court, Tumakuru                  |           11 |         1 | True     |
+|        23 | District & Sessions Court, Davanagere       |           12 |         1 | True     |
+|        24 | Court of JMFC, Davanagere                   |           12 |         1 | True     |
+|        25 | Court of Civil Judge, Udupi                 |           13 |         1 | True     |
+|        26 | Family Court, Udupi                         |           13 |         1 | True     |
+|        27 | Special Court (POCSO), Chikkamagaluru       |           14 |         1 | True     |
+|        28 | District & Sessions Court, Chikkamagaluru   |           14 |         1 | True     |
+|        29 | Court of Civil Judge, Hassan                |           15 |         1 | True     |
+|        30 | Special Court (POCSO), Hassan               |           15 |         1 | True     |
+|        31 | Fast Track Court, Mandya                    |           16 |         1 | True     |
+|        32 | Fast Track Court, Mandya                    |           16 |         1 | True     |
+|        33 | Special Court (POCSO), Raichur              |           17 |         1 | True     |
+|        34 | Fast Track Court, Raichur                   |           17 |         1 | True     |
+|        35 | Court of Civil Judge, Bidar                 |           18 |         1 | True     |
+|        36 | District & Sessions Court, Bidar            |           18 |         1 | True     |
+|        37 | Court of Civil Judge, Kolar                 |           19 |         1 | True     |
+|        38 | Court of Civil Judge, Kolar                 |           19 |         1 | True     |
+|        39 | Special Court (POCSO), Chitradurga          |           20 |         1 | True     |
+|        40 | Family Court, Chitradurga                   |           20 |         1 | True     |

@@ -1,0 +1,11 @@
+# UnitType
+
+Row count: 5
+
+|   UnitTypeID | UnitTypeName          | CityDistState   |   Hierarchy | Active   |
+|-------------:|:----------------------|:----------------|------------:|:---------|
+|            1 | Police Station        | City            |           1 | True     |
+|            2 | Sub-Division          | District        |           2 | True     |
+|            3 | District Headquarters | District        |           3 | True     |
+|            4 | Range HQ              | State           |           4 | True     |
+|            5 | State HQ              | State           |           5 | True     |

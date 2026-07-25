@@ -1,0 +1,16 @@
+# Act
+
+Row count: 10
+
+| ActCode   | ActDescription                                        | ShortName   | Active   |
+|:----------|:------------------------------------------------------|:------------|:---------|
+| IPC       | Indian Penal Code, 1860                               | IPC         | True     |
+| BNS       | Bharatiya Nyaya Sanhita, 2023                         | BNS         | True     |
+| NDPS      | Narcotic Drugs and Psychotropic Substances Act, 1985  | NDPS        | True     |
+| MVACT     | Motor Vehicles Act, 1988                              | MV Act      | True     |
+| ITACT     | Information Technology Act, 2000                      | IT Act      | True     |
+| POCSO     | Protection of Children from Sexual Offences Act, 2012 | POCSO       | True     |
+| ARMSACT   | Arms Act, 1959                                        | Arms Act    | True     |
+| SCST      | SC/ST (Prevention of Atrocities) Act, 1989            | SC/ST Act   | True     |
+| EXCISE    | Karnataka Excise Act, 1965                            | Excise Act  | True     |
+| GAMBLING  | Karnataka Police Act, 1963                            | KP Act      | True     |

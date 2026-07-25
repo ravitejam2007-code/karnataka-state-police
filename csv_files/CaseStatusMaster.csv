@@ -1,0 +1,10 @@
+CaseStatusID,CaseStatusName
+1,Under Investigation
+2,Charge Sheeted
+3,Case Closed - A Final
+4,Case Closed - B Final
+5,Case Closed - C Final
+6,Under Trial
+7,Convicted
+8,Acquitted
+9,Pending Court Trial

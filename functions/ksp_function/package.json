@@ -4,6 +4,7 @@
 	"main": "index.js",
 	"author": "",
 	"dependencies": {
-		"zcatalyst-sdk-node": "latest"
+		"zcatalyst-sdk-node": "latest",
+		"jsonwebtoken": "^9.0.2"
 	}
 }

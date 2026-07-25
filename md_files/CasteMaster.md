@@ -1,0 +1,16 @@
+# CasteMaster
+
+Row count: 10
+
+|   caste_master_id | caste_master_name   |
+|------------------:|:--------------------|
+|                 1 | General             |
+|                 2 | SC                  |
+|                 3 | ST                  |
+|                 4 | OBC                 |
+|                 5 | Category-1          |
+|                 6 | Category-2A         |
+|                 7 | Category-2B         |
+|                 8 | Category-3A         |
+|                 9 | Category-3B         |
+|                10 | Not Disclosed       |

@@ -1,0 +1,16 @@
+# Designation
+
+Row count: 10
+
+|   DesignationID | DesignationName         |   SortOrder | Active   |
+|----------------:|:------------------------|------------:|:---------|
+|               1 | Investigating Officer   |           1 | True     |
+|               2 | Station House Officer   |           2 | True     |
+|               3 | Beat Officer            |           3 | True     |
+|               4 | Circle Inspector        |           4 | True     |
+|               5 | Sub-Divisional Officer  |           5 | True     |
+|               6 | District Superintendent |           6 | True     |
+|               7 | Range DIG               |           7 | True     |
+|               8 | Cyber Cell Officer      |           8 | True     |
+|               9 | Traffic Officer         |           9 | True     |
+|              10 | Women Cell Officer      |          10 | True     |
