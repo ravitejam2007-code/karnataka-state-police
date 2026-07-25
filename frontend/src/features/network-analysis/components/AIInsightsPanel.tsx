@@ -1,42 +1,115 @@
-import { Brain, LayoutTemplate, Activity, Target, ShieldAlert, GitBranch } from "lucide-react";
-import type { NetworkTemplate } from "../types";
+import { useState } from "react";
+import { Brain, Shield, ChevronDown, Check, Activity, Target, ShieldAlert, GitBranch, Sparkles } from "lucide-react";
 
 interface Props {
-  templates: NetworkTemplate[];
-  activeTemplateId: string;
-  onSelectTemplate: (id: string) => void;
+  activeCaseId: string;
+  onSelectCase: (caseId: string) => void;
 }
 
-export function AIInsightsPanel({ templates, activeTemplateId, onSelectTemplate }: Props) {
+const CASES_OPTIONS = [
+  {
+    id: "FIR-2026-0412",
+    title: "FIR/2026/0412 - Mysuru Bank Robbery Syndicate",
+    district: "Mysuru Urban",
+    nodes: 8,
+    edges: 12,
+    risk: "High Priority"
+  },
+  {
+    id: "FIR-2026-1098",
+    title: "FIR/2026/1098 - Cyber Crypto Phishing Network",
+    district: "Bengaluru East",
+    nodes: 14,
+    edges: 22,
+    risk: "Critical"
+  },
+  {
+    id: "FIR-2025-0891",
+    title: "FIR/2025/0891 - Interstate Vehicle Theft Ring",
+    district: "Chamarajanagar",
+    nodes: 6,
+    edges: 9,
+    risk: "Medium"
+  }
+];
+
+export function AIInsightsPanel({ activeCaseId, onSelectCase }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const activeCase = CASES_OPTIONS.find(c => c.id === activeCaseId) || CASES_OPTIONS[0];
+
   return (
-    <div className="hidden lg:flex w-72 bg-white border-r border-[#E2E8F0] flex-col h-full overflow-hidden text-[#1E293B] shrink-0 font-sans">
+    <div className="hidden lg:flex w-80 bg-white border-r border-[#E2E8F0] flex-col h-full overflow-hidden text-[#1E293B] shrink-0 font-sans">
       
-      <div className="p-4 border-b border-[#E2E8F0] bg-[#F8FAFC]">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-3 flex items-center gap-2">
-          <LayoutTemplate className="h-3.5 w-3.5 text-[#2563EB]" />
-          Investigation Templates
+      {/* Case Intelligence Selector Top Section */}
+      <div className="p-3.5 border-b border-[#E2E8F0] bg-[#F8FAFC] space-y-2.5">
+        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
+          <span className="flex items-center gap-1.5">
+            <Shield className="h-3.5 w-3.5 text-[#0F172A]" />
+            Case Intelligence Selector
+          </span>
+          <span className="text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded font-mono font-bold text-[9px]">
+            LIVE GRAPH
+          </span>
         </div>
-        <div className="space-y-1.5">
-          {templates.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => onSelectTemplate(t.id)}
-              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors border ${
-                activeTemplateId === t.id 
-                  ? 'bg-[#2563EB] border-[#2563EB] text-white font-bold shadow-2xs' 
-                  : 'bg-white border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#475569]'
-              }`}
-            >
-              <div className="font-semibold">{t.name}</div>
-            </button>
-          ))}
+
+        {/* Dropdown Selector Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white border border-[#E2E8F0] hover:border-slate-400 transition-colors text-left shadow-2xs cursor-pointer"
+        >
+          <div className="min-w-0 flex-1 mr-2">
+            <div className="text-xs font-bold text-[#1F2937] leading-tight truncate">{activeCase.title}</div>
+            <div className="text-[10px] text-[#64748B] flex items-center gap-1.5 mt-1">
+              <span>{activeCase.district}</span>
+              <span>•</span>
+              <span className="font-mono font-semibold text-[#0F172A]">{activeCase.nodes} Nodes / {activeCase.edges} Edges</span>
+            </div>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-[#64748B] shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        {/* Expanded Options Dropdown */}
+        {isOpen && (
+          <div className="space-y-1 pt-1 border-t border-[#E2E8F0] animate-in fade-in-50">
+            {CASES_OPTIONS.map((c) => {
+              const isSelected = c.id === activeCase.id;
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => {
+                    onSelectCase(c.id);
+                    setIsOpen(false);
+                  }}
+                  className={`p-2 rounded-lg cursor-pointer transition-colors text-xs flex items-center justify-between ${
+                    isSelected 
+                      ? "bg-[#0F172A] text-white font-semibold shadow-2xs" 
+                      : "hover:bg-white text-[#1F2937] border border-transparent hover:border-[#E2E8F0]"
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <div className="font-bold leading-tight truncate">{c.title}</div>
+                    <div className={`text-[10px] ${isSelected ? "text-slate-300" : "text-[#64748B]"}`}>
+                      {c.district} • {c.nodes} Suspect Nodes
+                    </div>
+                  </div>
+                  {isSelected && <Check className="h-4 w-4 text-emerald-400 shrink-0 ml-2" />}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="text-[10px] text-[#64748B] flex items-center gap-1.5 pt-0.5">
+          <Sparkles className="h-3 w-3 text-[#0F172A] shrink-0" />
+          <span>Selecting a case auto-maps suspect network graphs.</span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-5">
+      {/* AI Network Insights Content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         
-        <div className="flex items-center gap-2 text-[#2563EB] mb-1 border-b border-[#E2E8F0] pb-2">
-          <Brain className="h-4 w-4 text-[#2563EB]" />
+        <div className="flex items-center gap-2 text-[#0F172A] border-b border-[#E2E8F0] pb-2">
+          <Brain className="h-4 w-4 text-[#0F172A]" />
           <h2 className="font-bold text-xs uppercase tracking-wider text-[#1E293B]">AI Network Insights</h2>
         </div>
 
@@ -86,15 +159,15 @@ export function AIInsightsPanel({ templates, activeTemplateId, onSelectTemplate 
 
           <div className="space-y-1.5">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#64748B]">
-              <Activity className="h-3.5 w-3.5 text-[#2563EB]" />
+              <Activity className="h-3.5 w-3.5 text-[#0F172A]" />
               Suggested Leads
             </div>
             <div className="space-y-1.5">
-              <button className="w-full text-left text-xs font-semibold px-2.5 py-1.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#2563EB]/10 hover:text-[#2563EB] transition-colors text-[#1E293B]">
-                Subpoena HDFC Bank Records
+              <button className="w-full text-left text-xs font-semibold px-2.5 py-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#0F172A] hover:text-white transition-colors text-[#1E293B] cursor-pointer">
+                Subpoena Bank Account Logs
               </button>
-              <button className="w-full text-left text-xs font-semibold px-2.5 py-1.5 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#2563EB]/10 hover:text-[#2563EB] transition-colors text-[#1E293B]">
-                Locate Vehicle KA-09-ER
+              <button className="w-full text-left text-xs font-semibold px-2.5 py-2 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] hover:bg-[#0F172A] hover:text-white transition-colors text-[#1E293B] cursor-pointer">
+                Locate Vehicle KA-09-ER-4567
               </button>
             </div>
           </div>

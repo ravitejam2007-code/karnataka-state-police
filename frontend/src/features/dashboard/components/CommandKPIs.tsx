@@ -64,8 +64,8 @@ export function CommandKPIs() {
                 <TrendBadge trend={kpi.trend} />
               </div>
             </div>
-            <div className="p-2 rounded-lg shrink-0 bg-primary/5 text-primary border border-primary/10">
-              <kpi.icon className="h-4 w-4" />
+            <div className="p-2.5 rounded-xl shrink-0 bg-[#F3F4F6] text-[#111827] border border-[#E5E7EB]">
+              <kpi.icon className="h-4 w-4 text-[#111827]" />
             </div>
           </CardContent>
         </Card>

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { CasesTable } from "./components/CasesTable"
 import { CasesFilters } from "./components/CasesFilters"
 import { CaseDetailsDrawer } from "./components/CaseDetailsDrawer"
+import { NewCaseModal } from "./components/NewCaseModal"
 import { useTranslation } from "react-i18next"
 import type { Case } from "./types"
 
@@ -98,27 +99,37 @@ const MOCK_CASES: Case[] = [
 ]
 
 export function CasesPage() {
+  const [casesList, setCasesList] = useState<Case[]>(MOCK_CASES)
   const [searchQuery, setSearchQuery] = useState("")
   const [showFilters, setShowFilters] = useState(false)
   const [selectedCase, setSelectedCase] = useState<Case | null>(null)
+  const [isNewCaseModalOpen, setIsNewCaseModalOpen] = useState(false)
   const { t } = useTranslation()
   
-  const filteredCases = MOCK_CASES.filter(c => 
+  const filteredCases = casesList.filter(c => 
     c.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
     c.firNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.id.toLowerCase().includes(searchQuery.toLowerCase())
+    c.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.officer.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleCaseCreated = (newCase: Case) => {
+    setCasesList(prev => [newCase, ...prev])
+  }
+
   return (
-    <div className="flex-1 flex flex-col space-y-6 pb-8">
+    <div className="flex-1 flex flex-col space-y-6 pb-8 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-[#E5E7EB]">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("cases.title")}</h1>
-          <p className="text-muted-foreground mt-1">{t("cases.subtitle")}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#111827]">{t("cases.title")}</h1>
+          <p className="text-xs text-[#6B7280] mt-1">{t("cases.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button>
+          <Button
+            onClick={() => setIsNewCaseModalOpen(true)}
+            className="bg-[#111827] hover:bg-[#1F2937] text-white font-semibold text-xs h-10 px-4 rounded-xl cursor-pointer shadow-2xs"
+          >
             <Plus className="mr-2 h-4 w-4" />
             {t("cases.newCase")}
           </Button>
@@ -129,26 +140,27 @@ export function CasesPage() {
       <div className="flex flex-col gap-4">
         <div className="flex gap-2 w-full max-w-md">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
             <Input 
               placeholder={t("cases.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-10 h-10 bg-[#F9FAFC] border-[#E5E7EB] text-xs rounded-xl focus:ring-1 focus:ring-[#111827]"
             />
           </div>
           <Button 
             variant={showFilters ? "secondary" : "outline"} 
             onClick={() => setShowFilters(!showFilters)}
+            className="h-10 border-[#E5E7EB] text-[#111827] hover:bg-[#F3F4F6] rounded-xl text-xs cursor-pointer"
           >
-            <Filter className="mr-2 h-4 w-4" />
+            <Filter className="mr-2 h-4 w-4 text-[#6B7280]" />
             {t("cases.filters")}
           </Button>
         </div>
         
         {/* Expanded Filters */}
         {showFilters && (
-          <div className="p-4 bg-card border rounded-sm">
+          <div className="p-4 bg-white border border-[#E5E7EB] rounded-xl">
             <CasesFilters />
           </div>
         )}
@@ -166,6 +178,13 @@ export function CasesPage() {
       <CaseDetailsDrawer 
         caseData={selectedCase} 
         onClose={() => setSelectedCase(null)} 
+      />
+
+      {/* New Case Registration Modal */}
+      <NewCaseModal
+        isOpen={isNewCaseModalOpen}
+        onClose={() => setIsNewCaseModalOpen(false)}
+        onCaseCreated={handleCaseCreated}
       />
     </div>
   )

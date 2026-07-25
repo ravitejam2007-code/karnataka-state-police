@@ -65,17 +65,17 @@ export function CrimeMapPage() {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#F8FAFC] font-sans relative overflow-hidden">
-      {/* Top GIS Floating Command Header */}
-      <div className="bg-white border-b border-[#E2E8F0] px-4 py-3 shadow-2xs z-20 shrink-0 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      {/* Top GIS Command Header */}
+      <div className="bg-white border-b border-[#E5E7EB] px-4 py-3 shadow-2xs z-20 shrink-0 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-lg bg-[#2563EB]/10 border border-[#2563EB]/30 flex items-center justify-center text-[#2563EB]">
+          <div className="h-10 w-10 rounded-xl bg-[#F3F4F6] border border-[#E5E7EB] flex items-center justify-center text-[#111827]">
             <MapIcon className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-[#1E293B] leading-tight flex items-center gap-2">
+            <h1 className="text-xl font-bold text-[#111827] leading-tight flex items-center gap-2">
               {isKannada ? "ಅಪರಾಧ ಮುನ್ಸೂಚನೆ ಜಿಐಎಸ್ ಭೂಪಟ" : "Statewide Predictive Crime GIS Dashboard"}
             </h1>
-            <span className="text-[11px] text-[#64748B]">
+            <span className="text-xs text-[#6B7280]">
               {isKannada ? "ಕರ್ನಾಟಕ ಪೊಲೀಸ್ ಭೌಗೋಳಿಕ ಮಾಹಿತಿ ವ್ಯವಸ್ಥೆ" : "Karnataka Police Spatial Intelligence & GIS Unit"}
             </span>
           </div>

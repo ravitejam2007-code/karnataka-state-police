@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Treemap, Legend } from 'recharts'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
 const data = [
@@ -10,7 +10,7 @@ const data = [
   { name: 'Narcotics', value: 250 },
 ]
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#F2726F']
+const COLORS = ['#0F172A', '#2563EB', '#D97706', '#DC2626', '#4F46E5', '#059669']
 
 const treeData = [
   {
@@ -42,72 +42,39 @@ const treeData = [
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload;
+    const data = payload[0].payload
     return (
-      <div className="bg-white p-2 border rounded shadow-sm text-sm">
-        <p className="font-bold">{data.name}</p>
-        <p>Value: {data.value || data.size}</p>
+      <div className="bg-white p-2 border border-[#E2E8F0] rounded shadow-md text-xs font-sans">
+        <p className="font-bold text-[#1F2937]">{data.name}</p>
+        <p className="text-[#64748B]">Recorded Cases: <span className="font-mono font-bold text-[#0F172A]">{data.value}</span></p>
       </div>
-    );
+    )
   }
-  return null;
-};
-
-// Custom Treemap Content
-const CustomizedContent = (props: any) => {
-  const { root, depth, x, y, width, height, index, payload } = props
-
-  return (
-    <g>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        style={{
-          fill: depth < 2 ? COLORS[Math.floor((index / root.children.length) * 6)] : '#ffffff00',
-          stroke: '#fff',
-          strokeWidth: 2 / (depth + 1e-10),
-          strokeOpacity: 1 / (depth + 1e-10),
-        }}
-      />
-      {depth === 1 ? (
-        <text x={x + width / 2} y={y + height / 2 + 7} textAnchor="middle" fill="#fff" fontSize={14} fontWeight="bold">
-          {payload.name}
-        </text>
-      ) : null}
-      {depth === 2 ? (
-        <text x={x + 4} y={y + 18} fill="#fff" fontSize={12} fillOpacity={0.9}>
-          {payload.name}
-        </text>
-      ) : null}
-    </g>
-  )
+  return null
 }
-
 
 export function CrimeTypeCharts() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border-[#E2E8F0] shadow-2xs">
           <CardHeader>
-            <CardTitle>Crime Distribution</CardTitle>
-            <CardDescription>Major categories breakdown</CardDescription>
+            <CardTitle className="text-sm font-bold text-[#1F2937]">Crime Category Distribution</CardTitle>
+            <CardDescription className="text-xs text-[#64748B]">Statewide major offense breakdown</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[350px] w-full">
+            <div className="h-[320px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={data}
                     cx="50%"
                     cy="50%"
-                    innerRadius={80}
-                    outerRadius={120}
-                    paddingAngle={5}
+                    innerRadius={70}
+                    outerRadius={110}
+                    paddingAngle={4}
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent || 0) * 100}%`}
+                    label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     labelLine={false}
                   >
                     {data.map((_, index) => (
@@ -122,25 +89,30 @@ export function CrimeTypeCharts() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-[#E2E8F0] shadow-2xs">
           <CardHeader>
-            <CardTitle>Sub-Category Heatmap</CardTitle>
-            <CardDescription>Hierarchical view of crime types</CardDescription>
+            <CardTitle className="text-sm font-bold text-[#1F2937]">Sub-Category Crime Matrix</CardTitle>
+            <CardDescription className="text-xs text-[#64748B]">Hierarchical view of reported offenses</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="h-[350px] w-full relative -mx-4 sm:mx-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <Treemap
-                  data={treeData}
-                  dataKey="size"
-                  aspectRatio={4 / 3}
-                  stroke="#fff"
-                  content={<CustomizedContent />}
-                >
-                  <Tooltip />
-                </Treemap>
-              </ResponsiveContainer>
-            </div>
+          <CardContent className="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+            {treeData.map((category, idx) => (
+              <div key={idx} className="p-3 bg-[#F8FAFC] rounded-lg border border-[#E2E8F0] space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-[#1F2937]">
+                  <span>{category.name} Offenses</span>
+                  <span className="text-[10px] text-[#64748B] font-mono">
+                    Total: {category.children.reduce((acc, c) => acc + c.size, 0).toLocaleString()}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {category.children.map((sub, sIdx) => (
+                    <div key={sIdx} className="bg-white p-2 rounded border border-[#E2E8F0] flex items-center justify-between text-xs">
+                      <span className="text-[#475569] font-medium">{sub.name}</span>
+                      <span className="font-bold font-mono text-[#0F172A]">{sub.size.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>

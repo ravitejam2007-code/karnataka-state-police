@@ -12,7 +12,6 @@ import {
   ShieldAlert,
   Briefcase,
   ChevronDown,
-  PhoneCall,
   ChevronUp,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -77,10 +76,10 @@ function CollapsibleSection({
               onClick={onItemClick}
               className={({ isActive }) =>
                 cn(
-                  "group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-all",
+                  "group flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-all",
                   isActive
-                    ? "bg-[#2563EB] text-white font-semibold shadow-xs"
-                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#1E293B]"
+                    ? "bg-[#F3F4F6] text-[#111827] font-bold border border-[#E5E7EB]"
+                    : "text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
                 )
               }
             >
@@ -90,7 +89,7 @@ function CollapsibleSection({
                     <item.icon
                       className={cn(
                         "mr-2.5 h-4 w-4 flex-shrink-0 transition-colors",
-                        isActive ? "text-white" : "text-[#64748B] group-hover:text-[#1E293B]"
+                        isActive ? "text-[#111827]" : "text-[#6B7280] group-hover:text-[#111827]"
                       )}
                     />
                     <span>{t(`sidebar.${item.key}`)}</span>
@@ -139,7 +138,7 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
 
   return (
     <div className="flex h-full w-64 flex-col border-r border-[#E2E8F0] bg-white text-[#1E293B] font-sans">
-      {/* Navigation Links directly at top - Officer Card Removed */}
+      {/* Navigation Links */}
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-3">
         {filteredMainNav.length > 0 && (
           <CollapsibleSection title={t("sidebar.coreOperations")} items={filteredMainNav} onItemClick={onClose} />
@@ -150,31 +149,6 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         {filteredAdminNav.length > 0 && (
           <CollapsibleSection title={t("sidebar.administration")} items={filteredAdminNav} defaultOpen={false} onItemClick={onClose} />
         )}
-      </div>
-
-      {/* Bottom Dispatch Card */}
-      <div className="p-3 border-t border-[#E2E8F0]">
-        <div className="rounded-lg p-3 bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-md bg-red-600 text-white">
-              <PhoneCall className="h-3.5 w-3.5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-[#1E293B] leading-tight">{t("sidebar.ershHotline")}</span>
-              <span className="text-[9px] text-[#64748B]">{t("sidebar.stateDispatch")}</span>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              onClose?.()
-              alert("Connecting to 112 Control Desk...")
-            }}
-            className="w-full py-1.5 px-3 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors shadow-2xs flex items-center justify-center gap-1.5"
-          >
-            <PhoneCall className="h-3 w-3" />
-            <span>{t("sidebar.connectDesk")}</span>
-          </button>
-        </div>
       </div>
     </div>
   )

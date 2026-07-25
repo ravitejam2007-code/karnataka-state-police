@@ -28,6 +28,8 @@ const SettingsPage = lazy(() => import("@/features/settings/SettingsPage").then(
 import { useAuthStore, type Role } from "@/store/useAuthStore"
 import { Button } from "@/components/ui/button"
 
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary"
+
 // Guard for protected routes
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, token, user } = useAuthStore()
@@ -107,55 +109,79 @@ function App() {
             <Route path="role-selection" element={<Navigate to="/app/dashboard" replace />} />
           </Route>
 
-          {/* Protected Main Routes with RBAC */}
+          {/* Protected Main Routes with RBAC & Error Boundaries */}
           <Route path="/app" element={
             <ProtectedRoute>
               <MainLayout />
             </ProtectedRoute>
           }>
             <Route index element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="dashboard" element={<CommandDashboard />} />
-            <Route path="cases" element={<CasesPage />} />
+            <Route path="dashboard" element={
+              <ErrorBoundary moduleName="Command Operations Center">
+                <CommandDashboard />
+              </ErrorBoundary>
+            } />
+            <Route path="cases" element={
+              <ErrorBoundary moduleName="Case Files">
+                <CasesPage />
+              </ErrorBoundary>
+            } />
             <Route path="investigation" element={
               <RoleGuard allowedRoles={["Administrator", "Police Officer", "Investigator", "Supervisor"]}>
-                <InvestigationPage />
+                <ErrorBoundary moduleName="Investigation Workspace">
+                  <InvestigationPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             
             {/* RBAC Protected Modules */}
             <Route path="ai" element={
               <RoleGuard allowedRoles={["Administrator", "Police Officer", "Investigator", "Analyst", "Supervisor"]}>
-                <AIAssistantPage />
+                <ErrorBoundary moduleName="AI Assistant">
+                  <AIAssistantPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="map" element={
               <RoleGuard allowedRoles={["Administrator", "Police Officer", "Investigator", "Supervisor"]}>
-                <CrimeMapPage />
+                <ErrorBoundary moduleName="Crime Predictive Map">
+                  <CrimeMapPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="network" element={
               <RoleGuard allowedRoles={["Administrator", "Investigator", "Analyst", "Supervisor"]}>
-                <CriminalNetworkPage />
+                <ErrorBoundary moduleName="Criminal Network Analysis">
+                  <CriminalNetworkPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="analytics" element={
               <RoleGuard allowedRoles={["Administrator", "Analyst", "Investigator", "Supervisor", "Policy Maker"]}>
-                <CrimeAnalyticsPage />
+                <ErrorBoundary moduleName="Crime Analytics">
+                  <CrimeAnalyticsPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="forecast" element={
               <RoleGuard allowedRoles={["Administrator", "Analyst", "Investigator", "Supervisor", "Policy Maker"]}>
-                <CrimeForecastPage />
+                <ErrorBoundary moduleName="Crime Forecast">
+                  <CrimeForecastPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="reports" element={
               <RoleGuard allowedRoles={["Administrator", "Analyst", "Investigator", "Supervisor", "Policy Maker"]}>
-                <ReportsPage />
+                <ErrorBoundary moduleName="Reports Module">
+                  <ReportsPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
             <Route path="settings" element={
               <RoleGuard allowedRoles={["Administrator", "Supervisor"]}>
-                <SettingsPage />
+                <ErrorBoundary moduleName="Administration Settings">
+                  <SettingsPage />
+                </ErrorBoundary>
               </RoleGuard>
             } />
 
