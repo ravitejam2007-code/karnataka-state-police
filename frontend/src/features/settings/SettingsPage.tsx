@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { 
   Globe, Accessibility, Bell, Shield, Key, 
-  Info, Check, LogOut, Save
+  Info, Check, LogOut, Save, Eye, EyeOff
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +32,9 @@ export function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
@@ -111,36 +114,69 @@ export function SettingsPage() {
                 <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-[#0F172A]">Current Password</label>
-                    <Input 
-                      type="password" 
-                      value={currentPassword} 
-                      onChange={(e) => setCurrentPassword(e.target.value)} 
-                      placeholder="Enter current password"
-                      className="h-10 text-xs rounded-xl"
-                      required
-                    />
+                    <div className="relative">
+                      <Input 
+                        type={showCurrentPassword ? "text" : "password"} 
+                        value={currentPassword} 
+                        onChange={(e) => setCurrentPassword(e.target.value)} 
+                        placeholder="Enter current password"
+                        className="h-10 text-xs rounded-xl pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] p-1 cursor-pointer transition-colors"
+                        title={showCurrentPassword ? "Hide current password" : "Show current password"}
+                        tabIndex={-1}
+                      >
+                        {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-[#0F172A]">New Password</label>
-                    <Input 
-                      type="password" 
-                      value={newPassword} 
-                      onChange={(e) => setNewPassword(e.target.value)} 
-                      placeholder="Enter new password (min 6 chars)"
-                      className="h-10 text-xs rounded-xl"
-                      required
-                    />
+                    <div className="relative">
+                      <Input 
+                        type={showNewPassword ? "text" : "password"} 
+                        value={newPassword} 
+                        onChange={(e) => setNewPassword(e.target.value)} 
+                        placeholder="Enter new password (min 6 chars)"
+                        className="h-10 text-xs rounded-xl pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] p-1 cursor-pointer transition-colors"
+                        title={showNewPassword ? "Hide new password" : "Show new password"}
+                        tabIndex={-1}
+                      >
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-[#0F172A]">Confirm New Password</label>
-                    <Input 
-                      type="password" 
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
-                      placeholder="Confirm new password"
-                      className="h-10 text-xs rounded-xl"
-                      required
-                    />
+                    <div className="relative">
+                      <Input 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        value={confirmPassword} 
+                        onChange={(e) => setConfirmPassword(e.target.value)} 
+                        placeholder="Confirm new password"
+                        className="h-10 text-xs rounded-xl pr-10"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] p-1 cursor-pointer transition-colors"
+                        title={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                        tabIndex={-1}
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   </div>
                   <Button 
                     type="submit" 

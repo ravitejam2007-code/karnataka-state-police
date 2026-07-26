@@ -39,6 +39,7 @@ export function Register() {
   const { registerUser } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -199,13 +200,23 @@ export function Register() {
               <label className="text-[11px] font-semibold text-[#0F172A]" htmlFor="confirmPassword">
                 Confirm Password *
               </label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                placeholder="••••••••" 
-                {...register("confirmPassword")}
-                className={`h-8 text-xs border-[#E2E8F0] focus-visible:ring-[#0F172A] ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
-              />
+              <div className="relative">
+                <Input 
+                  id="confirmPassword" 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  placeholder="••••••••" 
+                  {...register("confirmPassword")}
+                  className={`h-8 text-xs pr-8 border-[#E2E8F0] focus-visible:ring-[#0F172A] ${errors.confirmPassword ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </button>
+              </div>
               {errors.confirmPassword && <p className="text-[10px] text-destructive mt-0.5">{errors.confirmPassword.message}</p>}
             </div>
           </div>
