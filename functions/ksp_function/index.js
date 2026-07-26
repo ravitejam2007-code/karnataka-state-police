@@ -31,7 +31,9 @@ validateEnvironment();
 module.exports = (req, res) => {
   res.req = req;
   const headers = getCorsHeaders(req);
-  const httpMethod = (req.method || (req.getMethod && req.getMethod()) || '').toUpperCase();
+  const httpMethod = (req.method || (req.getMethod && req.getMethod()) || 'GET').toUpperCase();
+
+  logger.info('REQ_START', `Incoming ${httpMethod} request: ${req.url || '/'}`, { origin: req.headers?.origin });
 
   // Set CORS Headers on response object upfront
   Object.keys(headers).forEach(key => {
@@ -50,7 +52,7 @@ module.exports = (req, res) => {
   }
 
   // Parse URL & Query parameters
-  const parsedUrl = urlModule.parse(req.url, true);
+  const parsedUrl = urlModule.parse(req.url || '/', true);
   let pathname = parsedUrl.pathname || '/';
 
   // Strip Catalyst context prefix if present (e.g. /app/ksp_function/...)
@@ -61,24 +63,9 @@ module.exports = (req, res) => {
 
   req.query = parsedUrl.query || {};
 
-  // Accumulate request body for POST/PUT/PATCH
-  let body = '';
-  req.on('data', chunk => {
-    body += chunk;
-  });
-
-  req.on('end', async () => {
+  // Execute request handler safely
+  const dispatchHandler = async () => {
     try {
-      if (body) {
-        try {
-          req.body = JSON.parse(body);
-        } catch (e) {
-          req.body = {};
-        }
-      } else {
-        req.body = {};
-      }
-
       let app;
       try {
         app = catalyst.initialize(req);
@@ -102,7 +89,51 @@ module.exports = (req, res) => {
       logger.error('SERVER_ERROR', `Unhandled request failure on ${httpMethod} ${pathname}: ${err.message}`, err);
       jsonError(res, err.message || 'Internal Server Error', statusCode);
     }
+  };
+
+  // Check if req.body is already pre-parsed by Catalyst Advanced I/O runtime wrapper
+  if (req.body !== undefined && req.body !== null && (typeof req.body === 'object' || typeof req.body === 'string')) {
+    if (typeof req.body === 'string') {
+      try { req.body = JSON.parse(req.body); } catch (e) { req.body = {}; }
+    }
+    dispatchHandler();
+    return;
+  }
+
+  // Otherwise handle raw incoming HTTP request stream
+  let body = '';
+  let handled = false;
+
+  const triggerDispatch = () => {
+    if (handled) return;
+    handled = true;
+    if (body) {
+      try { req.body = JSON.parse(body); } catch (e) { req.body = {}; }
+    } else {
+      req.body = req.body || {};
+    }
+    dispatchHandler();
+  };
+
+  req.on('data', chunk => {
+    body += chunk;
   });
+
+  req.on('end', () => {
+    triggerDispatch();
+  });
+
+  req.on('error', (err) => {
+    logger.warn('STREAM_ERROR', `Stream reading warning: ${err.message}`);
+    triggerDispatch();
+  });
+
+  // Safety fallback timer to prevent TCP socket hanging if req.on('end') does not fire
+  setTimeout(() => {
+    if (!handled) {
+      triggerDispatch();
+    }
+  }, 50);
 };
 
 /**
