@@ -3,65 +3,82 @@
 const { jsonSuccess, jsonError } = require('../utils/response');
 const { queryZCQL } = require('../services/datastore');
 const { queryQuickML } = require('../services/quickml');
-const { escapeZCQLString } = require('../utils/validators');
 
 /**
  * POST /ai/chat
+ * Flow:
+ * 1. User message
+ * 2. Query Catalyst Data Store using ZCQL
+ * 3. Build database context
+ * 4. Append context to prompt
+ * 5. Call queryQuickML()
+ * 6. Return AI response with citations, sources, and thought process
  */
 async function chat(app, req, res) {
   const { message } = req.body || {};
 
-  if (!message || typeof message !== 'string') {
+  if (!message || typeof message !== 'string' || !message.trim()) {
     return jsonError(res, 'Message prompt is required', 400);
   }
 
-  const promptLower = message.toLowerCase();
-
   try {
-    let responseText = '';
-    let sources = [];
-    let dataPayload = null;
+    // Step 1: Query Catalyst Data Store using ZCQL to build database context
+    let dbContextLines = [];
+    let dbRecords = [];
 
-    // Intent 1: Case search or FIR query
-    if (promptLower.includes('case') || promptLower.includes('fir') || promptLower.includes('robbery') || promptLower.includes('theft')) {
-      const zcql = `SELECT CaseMaster.FIRNumber, CaseMaster.CaseDate, CrimeHead.CrimeHeadName, CaseStatusMaster.StatusName FROM CaseMaster LEFT JOIN CrimeHead ON CaseMaster.CrimeMajorHeadID = CrimeHead.CrimeHeadID LEFT JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.CaseStatusID ORDER BY CaseMaster.CaseDate DESC LIMIT 5`;
-      const cases = await queryZCQL(app, zcql).catch(() => []);
+    try {
+      // Query recent FIR cases from CaseMaster
+      const zcqlCases = `SELECT CaseMaster.FIRNumber, CaseMaster.CaseDate, CrimeHead.CrimeHeadName, CaseStatusMaster.StatusName FROM CaseMaster LEFT JOIN CrimeHead ON CaseMaster.CrimeMajorHeadID = CrimeHead.CrimeHeadID LEFT JOIN CaseStatusMaster ON CaseMaster.CaseStatusID = CaseStatusMaster.CaseStatusID ORDER BY CaseMaster.CaseDate DESC LIMIT 5`;
+      const cases = await queryZCQL(app, zcqlCases).catch(() => []);
 
-      dataPayload = cases;
-      sources = cases.map(c => c.FIRNumber || 'CaseMaster');
-      responseText = `Found ${cases.length} recent matching FIR cases in the Karnataka State Police Database. Recent cases include FIRs for ${cases.map(c => c.CrimeHeadName || 'Crimes').join(', ')}.`;
-    }
-    // Intent 2: Legal section lookup (IPC / BNS / NDPS)
-    else if (promptLower.includes('ipc') || promptLower.includes('bns') || promptLower.includes('section') || promptLower.includes('act')) {
-      const zcql = `SELECT Section.SectionNumber, Section.SectionDescription, Act.ActName FROM Section JOIN Act ON Section.ActCode = Act.ActCode LIMIT 5`;
-      const sections = await queryZCQL(app, zcql).catch(() => []);
+      if (cases && cases.length > 0) {
+        dbRecords = cases;
+        dbContextLines.push('Recent Registered FIR Cases:');
+        cases.forEach((c) => {
+          dbContextLines.push(`• FIR: ${c.FIRNumber || 'N/A'} | Date: ${c.CaseDate || 'N/A'} | Offence: ${c.CrimeHeadName || 'General'} | Status: ${c.StatusName || 'Under Investigation'}`);
+        });
+      }
 
-      dataPayload = sections;
-      sources = sections.map(s => `${s.ActName} Sec ${s.SectionNumber}`);
-      responseText = `Retrieved relevant statutory sections from Indian Penal Code (IPC) and Bharatiya Nyaya Sanhita (BNS):\n` +
-        sections.map(s => `• ${s.ActName} Section ${s.SectionNumber}: ${s.SectionDescription || 'Penal provision'}`).join('\n');
-    }
-    // Intent 3: Statistics / Analytics request
-    else if (promptLower.includes('stat') || promptLower.includes('analytics') || promptLower.includes('count') || promptLower.includes('total')) {
-      const countRes = await queryZCQL(app, `SELECT COUNT(CaseMasterID) FROM CaseMaster`).catch(() => []);
-      const count = (countRes[0] && (countRes[0]['COUNT(CaseMasterID)'] || countRes[0].field_expression_0)) || 500;
+      // Query relevant statutory sections
+      const zcqlSections = `SELECT Section.SectionNumber, Section.SectionDescription, Act.ActName FROM Section JOIN Act ON Section.ActCode = Act.ActCode LIMIT 5`;
+      const sections = await queryZCQL(app, zcqlSections).catch(() => []);
 
-      responseText = `Karnataka State Police Database metrics: Currently tracking ${count} registered FIR cases. Active case resolution rate is 45.6%.`;
-      sources = ['CaseMaster Database'];
-    }
-    // Intent 4: Fallback QuickML RAG synthesis
-    else {
-      const mlResult = await queryQuickML(app, message);
-      responseText = mlResult.response;
-      sources = mlResult.sources;
+      if (sections && sections.length > 0) {
+        dbContextLines.push('\nRelevant Statutory Sections:');
+        sections.forEach((s) => {
+          dbContextLines.push(`• ${s.ActName || 'Act'} Section ${s.SectionNumber || ''}: ${s.SectionDescription || 'Penal provision'}`);
+        });
+      }
+    } catch (dbErr) {
+      console.warn('ZCQL Context Retrieval Warning:', dbErr.message);
     }
 
+    const dbContext = dbContextLines.length > 0
+      ? dbContextLines.join('\n')
+      : 'Statewide Karnataka State Police CCTNS Database Context Active';
+
+    // Step 2: Build prompt combining User Question and Database Context
+    const prompt = `
+Question:
+${message.trim()}
+
+Database Context:
+${dbContext}
+    `.trim();
+
+    // Step 3: Query QuickML RAG model
+    const answer = await queryQuickML(app, prompt);
+
+    // Step 4: Return AI response payload
     return jsonSuccess(res, {
-      response: responseText,
-      data: dataPayload,
-      sources
+      response: answer.response,
+      citations: answer.citations || [],
+      sources: answer.sources || [],
+      thought_process: answer.thought_process || '',
+      data: dbRecords
     });
   } catch (err) {
+    console.error('AI Chat Processing Error:', err);
     return jsonError(res, err.message || 'AI Chat processing failed', 500);
   }
 }

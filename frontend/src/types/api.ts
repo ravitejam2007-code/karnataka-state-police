@@ -195,6 +195,8 @@ export interface AIChatResponse {
   response: string;
   data?: unknown;
   sources?: string[];
+  citations?: string[];
+  thought_process?: string;
 }
 
 export interface ForecastPoint {
