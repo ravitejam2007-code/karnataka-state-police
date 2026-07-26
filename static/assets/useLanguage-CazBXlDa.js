@@ -1,0 +1,1 @@
+import{t as e}from"./useTranslation-DLBSQWxz.js";function t(){let{i18n:t}=e(),n=t.language,r=n===`kn`,i=e=>{t.changeLanguage(e)};return{currentLang:n,isKannada:r,setLanguage:i,toggleLanguage:()=>{i(r?`en`:`kn`)}}}export{t};

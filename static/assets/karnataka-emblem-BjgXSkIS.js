@@ -1,0 +1,1 @@
+var e=`/assets/karnataka-emblem-Bq3kgJdg.png`;export{e as t};
