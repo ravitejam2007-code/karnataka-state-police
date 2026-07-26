@@ -1,14 +1,20 @@
 'use strict';
 
 /**
- * Standard CORS headers to allow cross-origin requests from frontend apps
+ * Generates dynamic CORS headers reflecting the requesting origin
+ * @param {object} req Node.js IncomingMessage
+ * @returns {object} CORS headers map
  */
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, CATALYST-ORG',
-  'Content-Type': 'application/json'
-};
+function getCorsHeaders(req) {
+  const requestOrigin = (req && req.headers && (req.headers.origin || req.headers.Origin)) || '*';
+  return {
+    'Access-Control-Allow-Origin': requestOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, CATALYST-ORG, Accept',
+    'Access-Control-Allow-Credentials': 'true',
+    'Content-Type': 'application/json'
+  };
+}
 
 /**
  * Standardized JSON success response
@@ -18,7 +24,8 @@ const corsHeaders = {
  */
 function jsonSuccess(res, data, status = 200) {
   if (res.headersSent) return;
-  res.writeHead(status, corsHeaders);
+  const headers = getCorsHeaders(res.req);
+  res.writeHead(status, headers);
   res.end(JSON.stringify({
     status: 'success',
     data
@@ -33,7 +40,8 @@ function jsonSuccess(res, data, status = 200) {
  */
 function jsonError(res, message, status = 400) {
   if (res.headersSent) return;
-  res.writeHead(status, corsHeaders);
+  const headers = getCorsHeaders(res.req);
+  res.writeHead(status, headers);
   res.end(JSON.stringify({
     status: 'error',
     message
@@ -43,5 +51,5 @@ function jsonError(res, message, status = 400) {
 module.exports = {
   jsonSuccess,
   jsonError,
-  corsHeaders
+  getCorsHeaders
 };
