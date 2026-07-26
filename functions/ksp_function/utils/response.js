@@ -17,15 +17,12 @@ const ALLOWED_ORIGINS = [
  * @returns {object} CORS headers map
  */
 function getCorsHeaders(req) {
-  const requestOrigin = (req && req.headers && (req.headers.origin || req.headers.Origin)) || '';
+  const headersObj = (req && req.headers) || {};
+  const requestOrigin = headersObj.origin || headersObj.Origin || '';
 
-  let allowOrigin = '*';
+  let allowOrigin = 'https://static-ogejmnvp.onslate.in';
   if (requestOrigin) {
-    if (ALLOWED_ORIGINS.includes(requestOrigin) || requestOrigin.endsWith('.onslate.in') || requestOrigin.endsWith('.catalystserverless.com')) {
-      allowOrigin = requestOrigin;
-    } else {
-      allowOrigin = requestOrigin;
-    }
+    allowOrigin = requestOrigin;
   }
 
   return {
