@@ -94,7 +94,8 @@ async function routeRequest(app, req, res, method, path) {
   if (method === 'POST' && path === '/auth/login') return authRoutes.login(app, req, res);
   if (method === 'POST' && path === '/auth/register') return authRoutes.register(app, req, res);
   if (method === 'POST' && path === '/auth/verify-otp') return authRoutes.verifyOtp(app, req, res);
-  if (method === 'GET' && path === '/') return res.end(JSON.stringify({ status: 'active', message: 'KSP Catalyst API Service' }));
+  const { jsonSuccess } = require('./utils/response');
+  if (method === 'GET' && path === '/') return jsonSuccess(res, { status: 'active', message: 'KSP Catalyst API Service' });
 
   // --- Authenticated Middleware Verification ---
   let user;
