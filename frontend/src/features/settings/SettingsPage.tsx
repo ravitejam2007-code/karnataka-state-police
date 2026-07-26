@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { useLanguage } from "@/hooks/useLanguage"
 import { toast } from "sonner"
 import { AboutSystemPage } from "@/features/about/AboutSystemPage"
+import { RoleSecurityManagement } from "./RoleSecurityManagement"
 
 const SETTINGS_TABS = [
   { id: "security", label: "settings.security", icon: Shield },
@@ -146,7 +147,7 @@ export function SettingsPage() {
       case "language":
         return <LanguageSettingsContent />
       case "roles":
-        return <AdminRoleManagementContent />
+        return <RoleSecurityManagement />
       case "about":
         return <AboutSystemPage />
       default:
@@ -264,106 +265,5 @@ function LanguageSettingsContent() {
   )
 }
 
-function AdminRoleManagementContent() {
-  const { user, registeredUsers, updateUserRole } = useAuthStore()
-  const isAdmin = user?.role === "Administrator"
 
-  const handleRoleChange = (userId: string, newRole: any) => {
-    updateUserRole(userId, newRole)
-    toast.info(`Updated user role to ${newRole}`)
-  }
-
-  return (
-    <div className="space-y-6 font-sans">
-      <div>
-        <h2 className="text-xl font-bold text-foreground">Role-Based Access Control (RBAC) Management</h2>
-        <p className="text-sm text-muted-foreground">
-          {isAdmin
-            ? "Karnataka State Police Headquarters Control Panel for user role assignments."
-            : "Your assigned role and access permissions."}
-        </p>
-      </div>
-
-      <Card className="rounded-xl border-border/80 shadow-2xs">
-        <CardContent className="p-6 space-y-6">
-          {!isAdmin ? (
-            <div className="p-4 bg-muted/40 border border-border/60 rounded-xl space-y-3">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                <h3 className="font-bold text-sm text-foreground">Active Role Assignment</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className="text-muted-foreground">User Name:</span> <span className="font-bold text-foreground">{user?.name}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Badge ID:</span> <span className="font-mono font-bold text-primary">{user?.badgeId}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Department:</span> <span className="font-medium text-foreground">{user?.department}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Assigned Role:</span> <span className="font-bold text-emerald-700">{user?.role}</span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border/60">
-                <div className="flex items-center gap-2">
-                  <Key className="h-5 w-5 text-primary" />
-                  <h3 className="font-bold text-sm text-foreground">Registered Users Directory & RBAC Roles</h3>
-                </div>
-                <span className="text-xs font-semibold text-muted-foreground">{registeredUsers.length} Users</span>
-              </div>
-
-              <div className="divide-y divide-border/60">
-                {registeredUsers.map((u) => (
-                  <div key={u.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-sm text-foreground">{u.fullName}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
-                          {u.role}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-3 text-muted-foreground text-[11px]">
-                        <span>Email: <strong className="text-foreground">{u.email}</strong></span>
-                        <span>Badge: <strong className="font-mono text-primary">{u.badgeId}</strong></span>
-                        <span>Dept: <strong className="text-foreground">{u.department}</strong></span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <label className="text-[11px] text-muted-foreground font-medium">Role:</label>
-                      <select
-                        value={u.role}
-                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                        className="h-8 px-2 bg-background border border-input rounded text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
-                        {[
-                          "Administrator",
-                          "Police Officer",
-                          "Investigator",
-                          "Analyst",
-                          "Supervisor",
-                          "Policy Maker",
-                          "Citizen",
-                        ].map((r) => (
-                          <option key={r} value={r}>
-                            {r}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
 
