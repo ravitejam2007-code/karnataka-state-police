@@ -9,15 +9,20 @@ const urlModule = require('url');
 module.exports = (req, res) => {
   res.req = req;
   const headers = getCorsHeaders(req);
+  const httpMethod = (req.method || (req.getMethod && req.getMethod()) || '').toUpperCase();
 
-  // Set CORS Headers on response
+  // Set CORS Headers on response object upfront
   Object.keys(headers).forEach(key => {
-    res.setHeader(key, headers[key]);
+    try {
+      res.setHeader(key, headers[key]);
+    } catch (e) {}
   });
 
-  // Handle OPTIONS preflight request explicitly with dynamic CORS headers
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204, headers);
+  // Handle OPTIONS preflight request explicitly with status 200 OK / 204 No Content
+  if (httpMethod === 'OPTIONS') {
+    try {
+      res.writeHead(200, headers);
+    } catch (e) {}
     res.end();
     return;
   }

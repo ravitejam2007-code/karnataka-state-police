@@ -1,14 +1,15 @@
 'use strict';
 
 /**
- * List of explicitly allowed origins including development & production Slate URLs
+ * List of explicitly allowed origins including production Slate and local development URLs
  */
 const ALLOWED_ORIGINS = [
+  'https://static-zxzwdpob.onslate.in',
+  'https://static-ogejmnvp.onslate.in',
+  'https://ksp-arptech.onslate.in',
   'http://localhost:5173',
   'http://localhost:3000',
-  'http://127.0.0.1:5173',
-  'https://static-ogejmnvp.onslate.in',
-  'https://ksp-arptech.onslate.in'
+  'http://127.0.0.1:5173'
 ];
 
 /**
@@ -18,11 +19,15 @@ const ALLOWED_ORIGINS = [
  */
 function getCorsHeaders(req) {
   const headersObj = (req && req.headers) || {};
-  const requestOrigin = headersObj.origin || headersObj.Origin || '';
+  let requestOrigin = headersObj.origin || headersObj.Origin || '';
 
-  let allowOrigin = 'https://static-ogejmnvp.onslate.in';
+  if (typeof requestOrigin !== 'string') requestOrigin = '';
+
+  let allowOrigin = '*';
   if (requestOrigin) {
     allowOrigin = requestOrigin;
+  } else {
+    allowOrigin = 'https://static-zxzwdpob.onslate.in';
   }
 
   return {
