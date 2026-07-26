@@ -1,7 +1,9 @@
 'use strict';
 
+const logger = require('./logger');
+
 /**
- * List of explicitly allowed origins including production Slate and local development URLs
+ * Whitelist of strictly permitted origin domains
  */
 const ALLOWED_ORIGINS = [
   'https://static-zxzwdpob.onslate.in',
@@ -13,25 +15,30 @@ const ALLOWED_ORIGINS = [
 ];
 
 /**
- * Generates dynamic CORS headers reflecting the requesting origin
- * @param {object} req Node.js IncomingMessage
- * @returns {object} CORS headers map
+ * Validates request origin against ALLOWED_ORIGINS whitelist.
+ * Never reflects arbitrary unknown origins.
+ * @param {object} req Incoming request object
+ * @returns {object} Full CORS response headers map
  */
 function getCorsHeaders(req) {
   const headersObj = (req && req.headers) || {};
-  let requestOrigin = headersObj.origin || headersObj.Origin || '';
+  const requestOrigin = (headersObj.origin || headersObj.Origin || '').trim();
 
-  if (typeof requestOrigin !== 'string') requestOrigin = '';
+  let validatedOrigin = ALLOWED_ORIGINS[0]; // Default fallback origin
 
-  let allowOrigin = '*';
   if (requestOrigin) {
-    allowOrigin = requestOrigin;
-  } else {
-    allowOrigin = 'https://static-zxzwdpob.onslate.in';
+    const isExplicitlyAllowed = ALLOWED_ORIGINS.includes(requestOrigin);
+    const isSubdomainAllowed = requestOrigin.endsWith('.onslate.in') || requestOrigin.endsWith('.catalystserverless.com');
+
+    if (isExplicitlyAllowed || isSubdomainAllowed) {
+      validatedOrigin = requestOrigin;
+    } else {
+      logger.warn('CORS_SECURITY', `Rejected unlisted origin '${requestOrigin}'. Falling back to default whitelist.`, { requestOrigin });
+    }
   }
 
   return {
-    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Origin': validatedOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, CATALYST-ORG, Accept, Origin, Access-Control-Request-Method, Access-Control-Request-Headers',
     'Access-Control-Allow-Credentials': 'true',
@@ -43,7 +50,7 @@ function getCorsHeaders(req) {
 /**
  * Standardized JSON success response
  * @param {object} res Node.js ServerResponse
- * @param {any} data Response payload
+ * @param {any} data Payload data
  * @param {number} status HTTP status code (default 200)
  */
 function jsonSuccess(res, data, status = 200) {
@@ -68,7 +75,7 @@ function jsonError(res, message, status = 400) {
   res.writeHead(status, headers);
   res.end(JSON.stringify({
     status: 'error',
-    message
+    message: message || 'An unexpected error occurred'
   }));
 }
 
