@@ -1,19 +1,20 @@
 'use strict';
 
 const catalyst = require('zcatalyst-sdk-node');
-const { jsonError } = require('./utils/response');
+const { jsonError, corsHeaders } = require('./utils/response');
 const { authMiddleware } = require('./middleware/auth');
 const rbacMiddleware = require('./middleware/rbac');
 const urlModule = require('url');
 
 module.exports = (req, res) => {
-  // CORS Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  // Set CORS Headers on response
+  Object.keys(corsHeaders).forEach(key => {
+    res.setHeader(key, corsHeaders[key]);
+  });
 
+  // Handle OPTIONS preflight request explicitly with CORS headers
   if (req.method === 'OPTIONS') {
-    res.writeHead(204);
+    res.writeHead(204, corsHeaders);
     res.end();
     return;
   }

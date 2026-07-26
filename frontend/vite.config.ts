@@ -32,6 +32,15 @@ export default defineConfig({
     tailwindcss(),
     copyToStaticPlugin(),
   ],
+  server: {
+    proxy: {
+      '/app/ksp_function': {
+        target: 'https://ksp-60079542184.development.catalystserverless.com',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

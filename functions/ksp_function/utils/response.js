@@ -1,6 +1,16 @@
 'use strict';
 
 /**
+ * Standard CORS headers to allow cross-origin requests from frontend apps
+ */
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, CATALYST-ORG',
+  'Content-Type': 'application/json'
+};
+
+/**
  * Standardized JSON success response
  * @param {object} res Node.js ServerResponse
  * @param {any} data Response payload
@@ -8,7 +18,7 @@
  */
 function jsonSuccess(res, data, status = 200) {
   if (res.headersSent) return;
-  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.writeHead(status, corsHeaders);
   res.end(JSON.stringify({
     status: 'success',
     data
@@ -23,7 +33,7 @@ function jsonSuccess(res, data, status = 200) {
  */
 function jsonError(res, message, status = 400) {
   if (res.headersSent) return;
-  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.writeHead(status, corsHeaders);
   res.end(JSON.stringify({
     status: 'error',
     message
@@ -32,5 +42,6 @@ function jsonError(res, message, status = 400) {
 
 module.exports = {
   jsonSuccess,
-  jsonError
+  jsonError,
+  corsHeaders
 };
