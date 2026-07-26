@@ -1,5 +1,8 @@
 const API_BASE = import.meta.env.VITE_CATALYST_API_URL
-  || 'https://ksp-60079542184.development.catalystserverless.com/app/ksp_function';
+  ? import.meta.env.VITE_CATALYST_API_URL
+  : import.meta.env.DEV
+    ? '/app/ksp_function'
+    : 'https://ksp-60079542184.development.catalystserverless.com/app/ksp_function';
 
 function getToken(): string | null {
   try {
