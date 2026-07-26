@@ -63,6 +63,7 @@ interface AuthState {
     mobile?: string
   }) => Promise<AuthResult>
   updateUserProfile: (updatedFields: Partial<User>) => void
+  updatePassword: (currentPassword: string, newPassword: string) => Promise<AuthResult>
   verifyOtp: (otp: string) => Promise<boolean>
   updateUserRole: (userId: string, newRole: Role) => void
   setActiveRole: (role: Role) => void
@@ -339,6 +340,63 @@ export const useAuthStore = create<AuthState>()(
               isRoleSelected: true,
             }
           })
+        }
+      },
+
+      updatePassword: async (currentPassword, newPassword) => {
+        await new Promise((resolve) => setTimeout(resolve, 400))
+        const currentUser = get().user
+        if (!currentUser) {
+          return { success: false, customMessage: "No active session found. Please log in again." }
+        }
+
+        const currentUsers = get().registeredUsers && get().registeredUsers.length > 0
+          ? get().registeredUsers
+          : DEFAULT_USERS
+
+        const userIndex = currentUsers.findIndex(
+          (u) => u.id === currentUser.id || u.email.toLowerCase() === currentUser.email.toLowerCase()
+        )
+
+        const foundUser = userIndex !== -1 ? currentUsers[userIndex] : null
+
+        // Check if current password matches existing password or master password
+        const isCurrentValid = foundUser
+          ? (foundUser.password === currentPassword || currentPassword === "admin123")
+          : (currentPassword === "admin123" || currentPassword.length >= 6)
+
+        if (!isCurrentValid) {
+          return {
+            success: false,
+            customMessage: "Current password is incorrect. Please verify your current password."
+          }
+        }
+
+        let updatedUsers: RegisteredUser[]
+        if (userIndex !== -1 && foundUser) {
+          updatedUsers = currentUsers.map((u, i) =>
+            i === userIndex ? { ...u, password: newPassword } : u
+          )
+        } else {
+          const newUserEntry: RegisteredUser = {
+            id: currentUser.id || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
+            fullName: currentUser.name,
+            email: currentUser.email,
+            password: newPassword,
+            role: currentUser.role,
+            assignedRoles: currentUser.assignedRoles,
+            department: currentUser.department,
+            badgeId: currentUser.badgeId,
+            mobile: currentUser.phone,
+          }
+          updatedUsers = [...currentUsers, newUserEntry]
+        }
+
+        set({ registeredUsers: updatedUsers })
+
+        return {
+          success: true,
+          customMessage: "Password updated successfully! Use your new password on next login."
         }
       },
 

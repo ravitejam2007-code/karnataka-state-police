@@ -168,6 +168,7 @@ async function routeRequest(app, req, res, method, path) {
   // --- Protected Auth Routes ---
   if (method === 'GET' && path === '/auth/profile') return authRoutes.getProfile(app, req, res);
   if (method === 'PUT' && path === '/auth/profile') return authRoutes.updateProfile(app, req, res);
+  if (method === 'POST' && path === '/auth/change-password') return authRoutes.changePassword(app, req, res);
 
   // --- Case Routes ---
   if (method === 'GET' && path === '/cases') return caseRoutes.list(app, req, res);

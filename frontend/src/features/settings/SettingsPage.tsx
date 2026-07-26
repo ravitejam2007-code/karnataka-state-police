@@ -25,7 +25,7 @@ const SETTINGS_TABS = [
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState("security")
-  const { user, logout } = useAuthStore()
+  const { user, logout, updatePassword } = useAuthStore()
   const { t } = useTranslation()
 
   // Password Form State
@@ -34,8 +34,12 @@ export function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!currentPassword) {
+      toast.error("Please enter your current password.")
+      return
+    }
     if (newPassword !== confirmPassword) {
       toast.error("New passwords do not match. Please verify.")
       return
@@ -45,15 +49,22 @@ export function SettingsPage() {
       return
     }
     setIsUpdatingPassword(true)
-    setTimeout(() => {
-      setIsUpdatingPassword(false)
+
+    const res = await updatePassword(currentPassword, newPassword)
+    setIsUpdatingPassword(false)
+
+    if (res.success) {
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
       toast.success("Security password updated successfully!", {
-        description: "Your login credentials have been updated."
+        description: res.customMessage || "Your login credentials have been updated."
       })
-    }, 400)
+    } else {
+      toast.error("Password Update Failed", {
+        description: res.customMessage || "Current password is incorrect."
+      })
+    }
   }
 
   const renderContent = () => {

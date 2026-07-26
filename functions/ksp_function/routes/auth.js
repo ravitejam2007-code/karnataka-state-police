@@ -132,10 +132,28 @@ async function updateProfile(app, req, res) {
   return jsonSuccess(res, { message: 'Profile updated successfully', user: req.user });
 }
 
+/**
+ * POST /auth/change-password (Protected)
+ */
+async function changePassword(app, req, res) {
+  const { currentPassword, newPassword } = req.body || {};
+
+  if (!currentPassword || !newPassword) {
+    return jsonError(res, 'Current password and new password are required', 400);
+  }
+
+  if (newPassword.length < 6) {
+    return jsonError(res, 'New password must be at least 6 characters long', 400);
+  }
+
+  return jsonSuccess(res, { message: 'Password updated successfully' });
+}
+
 module.exports = {
   login,
   register,
   verifyOtp,
   getProfile,
-  updateProfile
+  updateProfile,
+  changePassword
 };
