@@ -14,9 +14,14 @@ function copyToStaticPlugin() {
         const staticDir = path.resolve(__dirname, '../static')
 
         if (fs.existsSync(distDir)) {
-          // Copy all build artifacts to static directory
+          // Clean previous static directory to remove stale chunks
+          if (fs.existsSync(staticDir)) {
+            fs.rmSync(staticDir, { recursive: true, force: true })
+          }
+          fs.mkdirSync(staticDir, { recursive: true })
+          // Copy all fresh build artifacts to static directory
           fs.cpSync(distDir, staticDir, { recursive: true })
-          console.log('[KSP Build] Successfully synced compiled production bundle to static/ directory for Catalyst deployment.')
+          console.log('[KSP Build] Successfully synced clean production bundle to static/ directory for Catalyst deployment.')
         }
       } catch (err) {
         console.error('[KSP Build Error] Failed to sync bundle to static/:', err)
