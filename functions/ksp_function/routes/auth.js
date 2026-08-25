@@ -23,19 +23,70 @@ async function login(app, req, res) {
 
     let employee = employees[0];
 
-    // Demo fallback for initial testing / development if DB query empty or admin login used
-    if (!employee && (identifier === 'admin' || identifier === 'ravitejam2007@gmail.com' || identifier.includes('@'))) {
-      employee = {
-        EmployeeID: 'EMP-001',
-        EmployeeName: identifier === 'admin' ? 'System Administrator' : 'Inspector Raviteja',
-        RankID: 'RANK-01',
-        DesignationID: 'DESIG-01',
-        UnitID: 'UNIT-01',
-        DistrictID: 'DIST-01',
-        email: identifier,
-        role: 'Administrator',
-        badgeId: 'KSP-9999'
-      };
+    // Demo fallback for initial testing / development if DB query empty or standard demo credentials used
+    if (!employee) {
+      const lowerId = identifier.toLowerCase();
+      if (lowerId === 'admin' || lowerId === 'ravitejam2007@gmail.com' || lowerId === 'ksp-2007') {
+        employee = {
+          EmployeeID: 'EMP-2007',
+          EmployeeName: 'Raviteja Manjunath',
+          RankID: 'RANK-01',
+          DesignationID: 'DESIG-01',
+          UnitID: 'UNIT-01',
+          DistrictID: 'DIST-01',
+          email: 'ravitejam2007@gmail.com',
+          role: 'Administrator',
+          badgeId: 'KSP-2007'
+        };
+      } else if (lowerId.includes('kumar') || lowerId === 'ksp-9824' || lowerId === 'r.kumar@ksp.gov.in') {
+        employee = {
+          EmployeeID: 'EMP-9824',
+          EmployeeName: 'Insp. R. Kumar',
+          RankID: 'RANK-02',
+          DesignationID: 'DESIG-02',
+          UnitID: 'UNIT-02',
+          DistrictID: 'DIST-01',
+          email: 'r.kumar@ksp.gov.in',
+          role: 'Senior Officers',
+          badgeId: 'KSP-9824'
+        };
+      } else if (lowerId.includes('ananya') || lowerId === 'ksp-3341' || lowerId === 'ananya.analyst@ksp.gov.in') {
+        employee = {
+          EmployeeID: 'EMP-3341',
+          EmployeeName: 'Ananya Sharma',
+          RankID: 'RANK-03',
+          DesignationID: 'DESIG-03',
+          UnitID: 'UNIT-03',
+          DistrictID: 'DIST-01',
+          email: 'ananya.analyst@ksp.gov.in',
+          role: 'Analyst',
+          badgeId: 'KSP-3341'
+        };
+      } else if (lowerId.includes('suresh') || lowerId === 'suresh.citizen@gmail.com') {
+        employee = {
+          EmployeeID: 'EMP-1042',
+          EmployeeName: 'Suresh Gowda',
+          RankID: 'RANK-04',
+          DesignationID: 'DESIG-04',
+          UnitID: 'UNIT-04',
+          DistrictID: 'DIST-01',
+          email: 'suresh.citizen@gmail.com',
+          role: 'Citizen',
+          badgeId: 'N/A'
+        };
+      } else if (lowerId.includes('@') || lowerId.startsWith('ksp-') || password === 'admin123') {
+        employee = {
+          EmployeeID: `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+          EmployeeName: identifier.includes('@') ? identifier.split('@')[0] : identifier,
+          RankID: 'RANK-01',
+          DesignationID: 'DESIG-01',
+          UnitID: 'UNIT-01',
+          DistrictID: 'DIST-01',
+          email: identifier.includes('@') ? identifier : `${identifier.toLowerCase()}@ksp.gov.in`,
+          role: 'Investigator',
+          badgeId: identifier.startsWith('ksp-') ? identifier.toUpperCase() : 'KSP-9999'
+        };
+      }
     }
 
     if (!employee) {

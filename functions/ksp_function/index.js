@@ -5,7 +5,6 @@ const { jsonError, jsonSuccess, getCorsHeaders } = require('./utils/response');
 const { authMiddleware } = require('./middleware/auth');
 const rbacMiddleware = require('./middleware/rbac');
 const logger = require('./utils/logger');
-const urlModule = require('url');
 
 // Environment variable validation during server startup
 function validateEnvironment() {
@@ -51,17 +50,24 @@ module.exports = (req, res) => {
     return;
   }
 
-  // Parse URL & Query parameters
-  const parsedUrl = urlModule.parse(req.url || '/', true);
-  let pathname = parsedUrl.pathname || '/';
+  // Parse URL & Query parameters safely using WHATWG URL standard
+  let pathname = '/';
+  req.query = {};
+  try {
+    const parsedUrl = new URL(req.url || '/', 'http://localhost');
+    pathname = parsedUrl.pathname || '/';
+    parsedUrl.searchParams.forEach((val, key) => {
+      req.query[key] = val;
+    });
+  } catch (e) {
+    pathname = (req.url || '/').split('?')[0] || '/';
+  }
 
   // Strip Catalyst context prefix if present (e.g. /app/ksp_function/...)
   if (pathname.includes('/ksp_function')) {
     pathname = pathname.substring(pathname.indexOf('/ksp_function') + '/ksp_function'.length);
   }
   if (!pathname || pathname === '') pathname = '/';
-
-  req.query = parsedUrl.query || {};
 
   // Execute request handler safely
   const dispatchHandler = async () => {
@@ -115,25 +121,29 @@ module.exports = (req, res) => {
     dispatchHandler();
   };
 
-  req.on('data', chunk => {
-    body += chunk;
-  });
+  if (typeof req.on === 'function') {
+    req.on('data', chunk => {
+      body += chunk;
+    });
 
-  req.on('end', () => {
-    triggerDispatch();
-  });
-
-  req.on('error', (err) => {
-    logger.warn('STREAM_ERROR', `Stream reading warning: ${err.message}`);
-    triggerDispatch();
-  });
-
-  // Safety fallback timer to prevent TCP socket hanging if req.on('end') does not fire
-  setTimeout(() => {
-    if (!handled) {
+    req.on('end', () => {
       triggerDispatch();
-    }
-  }, 50);
+    });
+
+    req.on('error', (err) => {
+      logger.warn('STREAM_ERROR', `Stream reading warning: ${err.message}`);
+      triggerDispatch();
+    });
+
+    // Safety fallback timer to prevent TCP socket hanging if req.on('end') does not fire
+    setTimeout(() => {
+      if (!handled) {
+        triggerDispatch();
+      }
+    }, 50);
+  } else {
+    triggerDispatch();
+  }
 };
 
 /**

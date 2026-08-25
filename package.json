@@ -1,0 +1,24 @@
+{
+  "name": "karnataka-state-police",
+  "version": "2.4.0",
+  "private": true,
+  "description": "Karnataka State Police (KSP) - Crime Intelligence & Analysis Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "lint": "npm --prefix frontend run lint",
+    "preview": "npm --prefix frontend run preview",
+    "import:data": "node scripts/import_all_ds.js",
+    "test:backend": "node -e \"require('./functions/ksp_function/index.js')\""
+  },
+  "keywords": [
+    "karnataka-state-police",
+    "crime-intelligence",
+    "law-enforcement",
+    "catalyst",
+    "react19",
+    "vite"
+  ],
+  "author": "Karnataka State Police IT Cell",
+  "license": "MIT"
+}
