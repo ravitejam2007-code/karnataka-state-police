@@ -432,12 +432,12 @@ function Footer() {
           <div>
             © 2026 Karnataka State Police • Government of Karnataka. All Rights Reserved.
           </div>
-          <div className="flex items-center gap-4 text-xs">
-            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Privacy Policy</a>
+          <div className="flex items-center gap-4 text-xs font-medium">
+            <Link to="/privacy-policy" className="hover:text-[#1E3A8A] transition-colors">Privacy Policy</Link>
             <span>•</span>
-            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Terms of Use</a>
+            <Link to="/terms-of-use" className="hover:text-[#1E3A8A] transition-colors">Terms of Use</Link>
             <span>•</span>
-            <a href="#" className="hover:text-[#1E3A8A] transition-colors">Accessibility Statement</a>
+            <Link to="/accessibility-statement" className="hover:text-[#1E3A8A] transition-colors">Accessibility Statement</Link>
           </div>
         </div>
       </div>

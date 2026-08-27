@@ -139,8 +139,14 @@ export function AIAssistantPage() {
     setIsThinking(true)
 
     try {
+      // Build conversation history for QuickML RAG multi-turn context
+      const historyPayload = messages.slice(-8).map(m => ({
+        role: m.sender === "user" ? "user" : "assistant",
+        content: m.text
+      }))
+
       // Dispatch to POST /ai/chat via useAIChat()
-      const res = await aiMutation.mutateAsync({ message: query })
+      const res = await aiMutation.mutateAsync({ message: query, history: historyPayload })
       setIsThinking(false)
 
       const aiMsg: ChatMessage = {
@@ -149,8 +155,8 @@ export function AIAssistantPage() {
         text: res.response || (isKannada ? "ವಿಶ್ಲೇಷಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ." : "Intelligence analysis complete."),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         citations: res.citations || ["Karnataka State Police Database", "IPC / BNS Legal Index"],
-        sources: res.sources || ["Karnataka State Police Database"],
-        thought_process: res.thought_process || "1. Processed query via QuickML RAG engine.\n2. Retrieved matched records from Karnataka State Police Database."
+        sources: res.sources || ["Catalyst QuickML RAG - Project 55466000000016001"],
+        thought_process: res.thought_process || "1. Processed query via Zoho Catalyst QuickML RAG engine (Project 55466000000016001).\n2. Retrieved matched records from Karnataka State Police Database."
       }
 
       setMessages(prev => [...prev, aiMsg])
@@ -166,7 +172,7 @@ export function AIAssistantPage() {
         text: fallback.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         citations: ["Karnataka State Police Database", "IPC / BNS Legal Index"],
-        sources: ["Karnataka State Police Database"],
+        sources: ["Catalyst QuickML RAG - Project 55466000000016001"],
         thought_process: "1. QuickML RAG Engine initialized.\n2. Cross-referenced query against Karnataka State Police Database.\n3. Synthesized structured crime intelligence analysis."
       }
 

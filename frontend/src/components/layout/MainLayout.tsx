@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import { Outlet, useLocation } from "react-router-dom"
 import { GovernmentHeader } from "./GovernmentHeader"
+import { GovernmentFooter } from "./GovernmentFooter"
 import { Sidebar } from "./Sidebar"
 import { ErrorBoundary } from "@/providers/ErrorBoundary"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -87,7 +88,7 @@ export function MainLayout() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-hidden bg-[#F8FAFC]">
+        <main className="flex-1 overflow-hidden bg-[#F8FAFC] flex flex-col">
           <ErrorBoundary>
             <Suspense fallback={
               <div className="h-full w-full p-4 md:p-8 flex flex-col gap-6 overflow-y-auto">
@@ -106,7 +107,7 @@ export function MainLayout() {
                 <Skeleton className="flex-1 w-full rounded-xl" />
               </div>
             }>
-              <div className="h-full w-full overflow-y-auto flex flex-col">
+              <div className="h-full w-full overflow-y-auto flex flex-col justify-between">
                 <div className={`flex-1 ${!isEdgeToEdge ? 'container mx-auto p-3 sm:p-4 md:p-6 lg:p-8' : 'w-full'} flex flex-col`}>
                   <AnimatePresence mode="wait">
                     <PageTransition>
@@ -116,6 +117,7 @@ export function MainLayout() {
                     </PageTransition>
                   </AnimatePresence>
                 </div>
+                {!isEdgeToEdge && <GovernmentFooter />}
               </div>
             </Suspense>
           </ErrorBoundary>

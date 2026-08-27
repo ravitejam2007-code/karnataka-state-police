@@ -5,7 +5,7 @@ const { queryQuickML } = require('../services/quickml');
 const logger = require('../utils/logger');
 
 async function chat(app, req, res) {
-  const { message } = req.body || {};
+  const { message, history } = req.body || {};
 
   if (!message || typeof message !== 'string' || !message.trim()) {
     return jsonError(res, 'Message is required', 400);
@@ -14,7 +14,7 @@ async function chat(app, req, res) {
   logger.info('AI_CHAT_REQUEST', 'Processing AI query', { promptLength: message.length });
 
   try {
-    const answer = await queryQuickML(message.trim());
+    const answer = await queryQuickML(message.trim(), history);
 
     logger.info('AI_CHAT_SUCCESS', 'AI response generated.');
 

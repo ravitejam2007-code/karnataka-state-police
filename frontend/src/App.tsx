@@ -29,6 +29,7 @@ const SettingsPage = lazy(() => import("@/features/settings/SettingsPage").then(
 const ProfilePage = lazy(() => import("@/features/profile/ProfilePage").then(m => ({ default: m.ProfilePage })))
 const OfficerVerificationPage = lazy(() => import("@/features/profile/OfficerVerificationPage").then(m => ({ default: m.OfficerVerificationPage })))
 const AboutSystemPage = lazy(() => import("@/features/about/AboutSystemPage").then(m => ({ default: m.AboutSystemPage })))
+const LegalPage = lazy(() => import("@/features/legal/LegalPage").then(m => ({ default: m.LegalPage })))
 
 import { useAuthStore, type Role } from "@/store/useAuthStore"
 import { Button } from "@/components/ui/button"
@@ -128,6 +129,28 @@ function App() {
               </ErrorBoundary>
             } />
 
+            {/* Public Legal & Compliance Routes */}
+            <Route path="/privacy-policy" element={
+              <ErrorBoundary moduleName="Privacy Policy">
+                <LegalPage initialTab="privacy" />
+              </ErrorBoundary>
+            } />
+            <Route path="/terms-of-use" element={
+              <ErrorBoundary moduleName="Terms of Use">
+                <LegalPage initialTab="terms" />
+              </ErrorBoundary>
+            } />
+            <Route path="/accessibility-statement" element={
+              <ErrorBoundary moduleName="Accessibility Statement">
+                <LegalPage initialTab="accessibility" />
+              </ErrorBoundary>
+            } />
+            <Route path="/legal/:tab?" element={
+              <ErrorBoundary moduleName="Legal & Compliance Center">
+                <LegalPage />
+              </ErrorBoundary>
+            } />
+
             {/* Auth Routes */}
             <Route path="/auth" element={
               <AuthRoute>
@@ -223,6 +246,26 @@ function App() {
               <Route path="about" element={
                 <ErrorBoundary moduleName="About KCIP Platform">
                   <AboutSystemPage />
+                </ErrorBoundary>
+              } />
+              <Route path="legal/:tab?" element={
+                <ErrorBoundary moduleName="Legal & Compliance Center">
+                  <LegalPage />
+                </ErrorBoundary>
+              } />
+              <Route path="privacy-policy" element={
+                <ErrorBoundary moduleName="Privacy Policy">
+                  <LegalPage initialTab="privacy" />
+                </ErrorBoundary>
+              } />
+              <Route path="terms-of-use" element={
+                <ErrorBoundary moduleName="Terms of Use">
+                  <LegalPage initialTab="terms" />
+                </ErrorBoundary>
+              } />
+              <Route path="accessibility-statement" element={
+                <ErrorBoundary moduleName="Accessibility Statement">
+                  <LegalPage initialTab="accessibility" />
                 </ErrorBoundary>
               } />
 

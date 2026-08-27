@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import karnatakaEmblem from "@/assets/karnataka-emblem.png"
 
 export function GovernmentFooter() {
@@ -18,21 +19,21 @@ export function GovernmentFooter() {
 
         {/* Right Links: Privacy Policy, Terms, Accessibility, Contact */}
         <div className="flex items-center gap-3 text-[11px] font-semibold text-[#64748B]">
-          <a href="#" className="hover:text-[#0F172A] transition-colors">
+          <Link to="/privacy-policy" className="hover:text-[#1E3A8A] transition-colors">
             Privacy Policy
-          </a>
+          </Link>
           <span className="text-[#CBD5E1]">•</span>
-          <a href="#" className="hover:text-[#0F172A] transition-colors">
+          <Link to="/terms-of-use" className="hover:text-[#1E3A8A] transition-colors">
             Terms of Use
-          </a>
+          </Link>
           <span className="text-[#CBD5E1]">•</span>
-          <a href="#" className="hover:text-[#0F172A] transition-colors">
-            Accessibility
-          </a>
+          <Link to="/accessibility-statement" className="hover:text-[#1E3A8A] transition-colors">
+            Accessibility Statement
+          </Link>
           <span className="text-[#CBD5E1]">•</span>
-          <a href="#" className="hover:text-[#0F172A] transition-colors">
+          <Link to="/app/about" className="hover:text-[#1E3A8A] transition-colors">
             Contact SCRB
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
